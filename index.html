@@ -1,0 +1,141 @@
+<html>
+
+<head>
+    <script src="https://unpkg.com/pts/dist/pts.min.js"></script>
+    <script src="https://unpkg.com/tone"></script>
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/js/uikit-icons.min.js"></script>
+</head>
+
+<body>
+    <body style="font-family: sans-serif; margin: 0;">
+        <div style="width: 800px; height: 600px; margin: 30px auto 0;">
+            <canvas id="pt"></canvas>
+        </div>
+        <div style="padding: 20px 0; font-family: sans-serif; font-size: 0.8em; color: #9ab; text-align: center;">
+            Limit cycle
+        </div>
+        <div id="settings" style="margin: auto; width: 300px">
+            <form class="uk-grid-small" uk-grid>
+                <div class="uk-width-1-4@s">
+                    <label>A</label>
+                    <input class="uk-input" type="number" id="game-config-value-a" placeholder="1.1" value="1.1">
+                </div>
+                <div class="uk-width-1-4@s">
+                    <label>D</label>
+                    <input class="uk-input" type="number" id="game-config-value-d" placeholder="-1.1">
+                </div>
+                <button onclick="reset_game_conditions(event)">Set new config</button>
+            </form>
+        </div>
+
+        <script>
+            let a = 1.1;
+            let d = -1.1;
+
+            function reset_game_conditions(event) {
+                event.preventDefault();
+                a = Number(document.getElementById('game-config-value-a').value);
+                d = Number(document.getElementById('game-config-value-d').value);
+                game_loop();
+            }
+
+            function game_loop() {
+                Pts.namespace(window);
+                var synth = new Tone.Synth().toMaster();
+                synth.triggerAttackRelease("C4", "32n");
+                var osc = new Tone.Oscillator({
+                    "frequency": 261.626,
+                    "type": "sawtooth10",
+                    "volume": -20
+                }).toMaster();
+                osc.start();
+
+                // Initiate Space and Form
+                var space = new CanvasSpace("#pt").setup({ bgcolor: "#345", resize: true, retina: true });
+                var form = space.getForm();
+                console.log("NEW")
+                console.log(typeof space)
+
+                var radius = 10;
+                var time_scale = 1 / 1000;
+                var visual_scale = 100;
+                var output_scale = 100;
+                var machine_learning_rate = .1;
+                var simulation_learning_rate = 1;
+
+                var y0 = 0;
+                var x0 = 0;
+
+                var x = .01;
+                var y = .01;
+                var points = new Group(new Pt(x0, y0), new Pt(x0, y0));
+
+                function objective1(x, y) {
+                    return d * y * y / 2 - x * y
+                }
+
+                function objective2(x, y) {
+                    return a * x * x / 2 + y * x / 2 - x * x * x * x / 4
+                }
+
+                function update1(x, y) {
+                    return simulation_learning_rate(d * y - x)
+                }
+
+                function update2(x, y) {
+                    return machine_learning_rate * (a * x + y - x * x * x)
+                }
+
+                // Transformation functions
+                function toOrigin(x, y) {
+                    return new Pt((x - x0) / visual_scale, -(y - y0) / visual_scale);
+                }
+
+                function fromOrigin(x, y) {
+                    return new Pt(x * visual_scale + x0, -y * visual_scale + y0);
+                }
+
+                function get_x() {
+                    return (space.pointer.x - x0) / visual_scale;
+                }
+
+
+
+                space.add({
+
+                    start: (bound) => {
+                        y0 = space.height / 2;
+                        x0 = space.width / 2;
+                    },
+
+                    animate: (time, ftime) => {
+                        x = get_x();
+                        //x = x + ftime*time_scale*update1(x,y);
+                        y = y + ftime * time_scale * update2(x, y);
+                        var f1 = objective1(x, y);
+                        osc.frequency.rampTo(261 - output_scale * f1, ftime / 1000);
+
+                        let c1 = Circle.fromCenter(fromOrigin(x, y), 5);
+
+                        let origin = Circle.fromCenter(new Pt(x0, y0), 10);
+
+                        form.fillOnly("#fff").circle(origin);
+                        form.fill("#000").circle(c1);
+
+                    }
+
+                });
+
+                // bind mouse events and play animation
+                space.bindMouse().bindTouch().play();
+            }
+            game_loop();
+        </script>
+    </body>
+
+</html>
