@@ -91,7 +91,7 @@ function game_loop() {
 
         animate: (time, ftime) => {
             x = get_x();
-            x = x + ftime*time_scale*update1(x,y);
+            // x = x + ftime*time_scale*update1(x,y);
             y = y + ftime * time_scale * update2(x, y);
             var f1 = total_cost(x, y);
             osc.frequency.rampTo(261 - output_scale * f1, ftime / 1000);

@@ -1,0 +1,40 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #ffe8df;
+}
+
+main {
+    margin: 15vh 20vw;
+    display: flex;
+    justify-content: space-around;
+}
+
+#form-header {
+    margin-top: 0;
+}
+
+#submit-button {
+    margin-left: 1em;
+}
+
+#game-parameter-input {
+    width: 60%;
+}
+
+#game-parameters-input {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+}
+
+.parameter{
+    display: block;
+    margin: 10px 0;
+    float: left;
+}
+
+#game-dynamics-visualization {
+    width: 600px;
+    height: 600px;
+    border: 2px solid black;
+}
