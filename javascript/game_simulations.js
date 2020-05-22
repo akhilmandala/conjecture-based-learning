@@ -1,22 +1,22 @@
 //Game dynamics variables
 // UNSTABLE:
-// var parameters = {
-//     a: 1,
-//     b: .2,
-//     c1: 1,
-//     c2: 1,
-//     d: 1,
-//     e: 0
-// }
-//STABLE:
 var parameters = {
     a: 1,
-    b: 2,
-    c1: -1,
+    b: .2,
+    c1: 1,
     c2: 1,
     d: 1,
-    e: 1
+    e: 0
 }
+// //STABLE:
+// var parameters = {
+//     a: 1,
+//     b: 2,
+//     c1: -1,
+//     c2: 1,
+//     d: 1,
+//     e: 1
+// }
 
 const DEFAULT_SIMULATION_SETTING = true;
 const COLOR_P1 = "#33f";
@@ -68,7 +68,7 @@ function game_loop() {
     console.log("NEW")
     console.log(typeof space)
 
-    var radius = 10;
+    var radius = 1;
     var time_scale = 1 / 1000;
     var visual_scale = 100;
     var output_scale = 100;
@@ -77,10 +77,11 @@ function game_loop() {
     var vectorfield_scale = 10;
 
     //Gameplay variables
-    var barrier = 0;
-    var lr1 = 0.5;
-    var lr2 = 0.5;
-    var lim = 2;
+    var barrier = 100.;
+    var lr1 = 3.;
+    var lr2 = 3.;
+    var xlim = 3.8/1.1;
+    var ylim = 2.1/1.1;
     var eps = 0.001;
     var x = .01;
     var y = .01;
@@ -103,7 +104,14 @@ function game_loop() {
 
     function log_barrier(x, min, max) {
         //return 0;
-        return -1 / (x - min) + 1 / (max - x);
+        return 1 / (x - min) - 1 / (max - x);
+    }
+
+    function poly_barrier(x, min, max, n=8) { 
+        // n must be even
+        if (x < min) return -Math.pow(min-x, n-1)/n;
+        if (x > max) return Math.pow(x-max, n-1)/n;
+        return 0;
     }
 
     function sat(x, lim) {
@@ -116,10 +124,10 @@ function game_loop() {
     }
 
     update1 = (x, y) => {
-        return a * x + c1 * y + d - barrier * log_barrier(x, -lim, lim);
+        return a * x + c1 * y + d + barrier * poly_barrier(x, -xlim, xlim);
     }
     update2 = (x, y) => {
-        return b * y + c2 * x + e - barrier * log_barrier(y, -lim, lim);
+        return b * y + c2 * x + e + barrier * poly_barrier(y, -ylim, ylim);
     }
 
 
