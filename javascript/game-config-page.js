@@ -1,7 +1,7 @@
 var parameters = {
     a: 1.1,
     b: 1.2,
-    c1: 3,
+    c1: -3,
     c2: 3,
     d: -1.1,
     e: -1.1
@@ -19,7 +19,10 @@ window.addEventListener("load", function () {
             console.log(key + ": " + FD.get(key));
             parameters[key] = FD.get(key);
         }
-        redraw();
+        XHR.open('GET', '/');
+        XHR.send(FD);
+        //Buggy function call
+        //redraw();
     }
 
     form.addEventListener("submit", (event) => {
@@ -28,16 +31,19 @@ window.addEventListener("load", function () {
     })
 })
 
-function load_visualization() {
-    
-}
 var locs = [];
 
-const scaleUp = (num, in_min = 1.0, in_max = -1.0, out_min = 0, out_max = 600) => {
+
+const LOWER_FUNCTION_BOUND = -1.5;
+const UPPER_FUNCTION_BOUND = 1.5;
+
+const SCREEN_RESOLUTION = 600;
+
+const scaleUp = (num, in_min = UPPER_FUNCTION_BOUND, in_max = LOWER_FUNCTION_BOUND, out_min = 0, out_max = SCREEN_RESOLUTION) => {
     return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-const scaleDown = (num, in_min = 0, in_max = 600, out_min = 1.0, out_max = -1.0) => {
+const scaleDown = (num, in_min = 0, in_max = SCREEN_RESOLUTION, out_min = UPPER_FUNCTION_BOUND, out_max = LOWER_FUNCTION_BOUND) => {
     return (num - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
@@ -59,6 +65,7 @@ function setup() {
     stroke(249, 78, 128);
 }
 
+//P5js functions
 function draw() {
     background(30, 67, 137);
     offset = 2;
@@ -87,5 +94,3 @@ function calcVec(x, y) {
     var y1 = scaleDown(y);
     return new p5.Vector(scaleUp(a * x1 + c1 * y1 + d), scaleUp(e + c2 * x1 + b * y1));
 }
-
-setup();
