@@ -83,7 +83,7 @@ function game_loop() {
     var xlim = 3.8/1.1;
     var ylim = 2.1/1.1;
     var eps = 0.001;
-    var x = .01;
+    var x = 2;
     var y = .01;
 
     var points = new Group(new Pt(x0, y0), new Pt(x0, y0));
@@ -156,6 +156,7 @@ function game_loop() {
         return (space.pointer.y - y0) / visual_scale;
     }
 
+    var history = new Group();
 
     console.log(x);
 
@@ -193,6 +194,7 @@ function game_loop() {
                 x = x - ftime * time_scale * lr1 * update1(x,y);
                 y = get_y()
             }*/
+            history.push(new Pt(x,y));
 
             // Output
             var f1 = cost1(x, y);
@@ -226,7 +228,7 @@ function game_loop() {
             let vectorfield_pts = Create.gridPts( space.innerBound, 20, 20);
             form.strokeOnly("#ccc",1).lines(vectorfield);
             form.fillOnly("#ccc").points(vectorfield_pts, 1);
-
+            form.strokeOnly("#888", 1).line(history.map((p)=>fromOrigin(p.x, p.y)));
 
         }
 
