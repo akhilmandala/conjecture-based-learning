@@ -12,3 +12,8 @@
 #parameter-form label {
     display: block;
 }
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #ffe8df;
+}

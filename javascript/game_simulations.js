@@ -18,6 +18,8 @@ var DEFAULT_PARAMETERS = {
 //     e: 1
 // }
 
+const form = document.getElementById("parameter-form");
+
 const DEFAULT_SIMULATION_SETTING = true;
 const DEFAULT_DISPLAY_VECTOR_FIELD_VIEW_SETTING = true;
 const DEFAULT_DISPLAY_PLAYER_ACTION_LINES_SETTING = true;
@@ -33,24 +35,41 @@ let display_vector_field = DEFAULT_DISPLAY_VECTOR_FIELD_VIEW_SETTING;
 let display_player_action_lines = DEFAULT_DISPLAY_PLAYER_ACTION_LINES_SETTING;
 let display_player_path = DEFAULT_DISPLAY_PLAYER_PATH_SETTING;
 
-window.addEventListener("load", function () {
-
-    this.console.log(form);
+//Event listeners
+window.addEventListener('load', function (event) {
+    this.console.log("Loaded DOM");
 
     //Set parameter values
     if(this.sessionStorage.getItem("parameters") === null) {
+        console.log("Initializing parameters");
         //First time page is being loaded, set the parameters to default
         this.sessionStorage.setItem("parameters", JSON.stringify(DEFAULT_PARAMETERS));
     }
 
+    var parameters = JSON.parse(sessionStorage.getItem("parameters"));
+
     for(let [parameter, value] of Object.entries(JSON.parse(this.sessionStorage.getItem("parameters")))) {
         this.document.getElementsByName(parameter)[0].value = value;
     }
+
+    //Initiate game loop
+    this.game_loop(parameters);
 })
 
-const form = document.getElementById("parameter-form");
+form.addEventListener('submit', function(event) {
+    loadGameConfiguration();
+})
 
-loadGameConfiguration = () => {
+document.addEventListener('keyup', function (event) {
+    if (event.ctrlKey && event.key === 't') {
+        event.preventDefault();
+        toggle_simulation = !toggle_simulation;
+        console.log(toggle_simulation)
+    }
+})
+
+//Helper functions
+function loadGameConfiguration() {
     this.console.log("updating..")
     let FD = new FormData(form);
     let parameters = JSON.parse(this.sessionStorage.getItem("parameters"));
@@ -67,18 +86,6 @@ loadGameConfiguration = () => {
     this.sessionStorage.setItem("parameters", JSON.stringify(parameters));
 }
 
-form.addEventListener('submit', function(event) {
-    loadGameConfiguration();
-})
-
-document.addEventListener('keyup', function (event) {
-    if (event.ctrlKey && event.key === 't') {
-        event.preventDefault();
-        toggle_simulation = !toggle_simulation;
-        console.log(toggle_simulation)
-    }
-})
-
 function reset_game_conditions(event) {
     event.preventDefault();
     a = Number(document.getElementById('game-config-value-a').value);
@@ -88,7 +95,7 @@ function reset_game_conditions(event) {
     console.log(d);
 }
 
-function game_loop() {
+function game_loop(parameters = DEFAULT_PARAMETERS) {
     console.log("INITIALIZING GAME STATE...");
     Pts.namespace(window);
     synth.triggerAttack("C4");
@@ -125,7 +132,7 @@ function game_loop() {
 
     var points = new Group(new Pt(x0, y0), new Pt(x0, y0));
 
-    let parameters = JSON.parse(sessionStorage.getItem("parameters"));
+    var parameters = JSON.parse(sessionStorage.getItem("parameters"));
     const { a, b, c1, c2, d, e } = parameters;
 
     function cost1(x, y) {
@@ -275,5 +282,3 @@ function game_loop() {
     // bind mouse events and play animation
     space.bindMouse().bindTouch().play();
 }
-
-window.game_loop();
