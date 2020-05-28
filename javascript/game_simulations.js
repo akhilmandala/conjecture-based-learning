@@ -205,7 +205,7 @@ function game_loop(parameters = DEFAULT_PARAMETERS) {
 
     console.log(x);
 
-    space.add({
+    const pts_gameplay = {
         start: (bound) => {
             y0 = space.height / 2;
             x0 = space.width / 2;
@@ -277,7 +277,9 @@ function game_loop(parameters = DEFAULT_PARAMETERS) {
 
         }
 
-    });
+    }
+
+    space.add(pts_gameplay);
 
     // bind mouse events and play animation
     space.bindMouse().bindTouch().play();
