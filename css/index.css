@@ -1,0 +1,14 @@
+#parameter-control-box {
+    margin: 5vh auto;
+    padding: 10px;
+    width: 30vw;
+    border: 1px solid black;
+}
+
+#parameter-control-box a {
+    display: block;
+}
+
+#parameter-form label {
+    display: block;
+}

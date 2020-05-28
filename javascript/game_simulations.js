@@ -1,15 +1,15 @@
 //Game dynamics variables
 // UNSTABLE:
-var parameters = {
+var DEFAULT_PARAMETERS = {
     a: 1,
     b: .2,
-    c1: 1,
+    c1: -1,
     c2: 1,
     d: 1,
     e: 0
 }
 // //STABLE:
-// var parameters = {
+// var DEFAULT_PARAMETERS = {
 //     a: 1,
 //     b: 2,
 //     c1: -1,
@@ -19,26 +19,63 @@ var parameters = {
 // }
 
 const DEFAULT_SIMULATION_SETTING = true;
+const DEFAULT_DISPLAY_VECTOR_FIELD_VIEW_SETTING = true;
+const DEFAULT_DISPLAY_PLAYER_ACTION_LINES_SETTING = true;
+const DEFAULT_DISPLAY_PLAYER_PATH_SETTING = true;
+
 const COLOR_P1 = "#33f";
 const COLOR_P2 = "#f33";
 
 var synth = new Tone.Synth().toMaster();
-let simulation = DEFAULT_SIMULATION_SETTING;
+
+let toggle_simulation = DEFAULT_SIMULATION_SETTING;
+let display_vector_field = DEFAULT_DISPLAY_VECTOR_FIELD_VIEW_SETTING;
+let display_player_action_lines = DEFAULT_DISPLAY_PLAYER_ACTION_LINES_SETTING;
+let display_player_path = DEFAULT_DISPLAY_PLAYER_PATH_SETTING;
 
 window.addEventListener("load", function () {
-    const button = document.getElementById("simulation-button");
-    button.addEventListener('click', event => {
-        event.preventDefault();
-        simulation = !simulation;
-        this.console.log(simulation);
-    })
+
+    this.console.log(form);
+
+    //Set parameter values
+    if(this.sessionStorage.getItem("parameters") === null) {
+        //First time page is being loaded, set the parameters to default
+        this.sessionStorage.setItem("parameters", JSON.stringify(DEFAULT_PARAMETERS));
+    }
+
+    for(let [parameter, value] of Object.entries(JSON.parse(this.sessionStorage.getItem("parameters")))) {
+        this.document.getElementsByName(parameter)[0].value = value;
+    }
+})
+
+const form = document.getElementById("parameter-form");
+
+loadGameConfiguration = () => {
+    this.console.log("updating..")
+    let FD = new FormData(form);
+    let parameters = JSON.parse(this.sessionStorage.getItem("parameters"));
+
+    for(var key of FD.keys()) {
+        console.log(key + ": " + FD.get(key));
+        parameters[key] = parseFloat(FD.get(key));
+        console.log(typeof FD.get(key));
+        this.document.getElementsByName(key)[0].value = FD.get(key);
+    }
+
+    console.log(parameters);
+
+    this.sessionStorage.setItem("parameters", JSON.stringify(parameters));
+}
+
+form.addEventListener('submit', function(event) {
+    loadGameConfiguration();
 })
 
 document.addEventListener('keyup', function (event) {
     if (event.ctrlKey && event.key === 't') {
         event.preventDefault();
-        simulation = !simulation;
-        console.log(simulation)
+        toggle_simulation = !toggle_simulation;
+        console.log(toggle_simulation)
     }
 })
 
@@ -88,6 +125,7 @@ function game_loop() {
 
     var points = new Group(new Pt(x0, y0), new Pt(x0, y0));
 
+    let parameters = JSON.parse(sessionStorage.getItem("parameters"));
     const { a, b, c1, c2, d, e } = parameters;
 
     function cost1(x, y) {
@@ -182,7 +220,7 @@ function game_loop() {
             form.strokeOnly(COLOR_P1, 2).line(br1);
             form.strokeOnly(COLOR_P2, 2).line(br2);
 
-            if (simulation) { // both players simulate
+            if (toggle_simulation) { // both players simulate
                 x = x - ftime * time_scale * lr1 * update1(x, y);
                 y = y - ftime * time_scale * lr2 * update2(x, y);
             } else { // player 1 is human
@@ -216,7 +254,7 @@ function game_loop() {
                     dy = -update2(q.x, q.y);
                     norm = Math.sqrt(dx*dx + dy*dy);
                     dy /= norm*vectorfield_scale;
-                    if(simulation) {
+                    if(toggle_simulation) {
                         dx /= norm*vectorfield_scale;
                     } else {
                         dx = 0;

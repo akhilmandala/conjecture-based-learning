@@ -2,10 +2,10 @@
 <head>
     <script src="https://unpkg.com/pts/dist/pts.min.js"></script>
     <script src="https://unpkg.com/tone"></script>
-    <!-- UIkit CSS -->
+    <!-- CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/css/uikit.min.css" />
-
-    <!-- UIkit JS -->
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/js/uikit.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/uikit@3.4.2/dist/js/uikit-icons.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -17,13 +17,29 @@
     <div style="padding: 20px 0; font-family: sans-serif; font-size: 0.8em; color: #9ab; text-align: center;">
         Limit cycle
     </div>
-    <button type="button" id="simulation-button">Toggle simulation</button>
-    <a href="game-config-page.html">Configure game</a>
+    <div id="parameter-control-box">
+        <form id="parameter-form">
+            <h2 id="form-header">Game parameters</h2>
+            <label for="parameter-a" class="parameter">A: <input type="text" name="a" id="parameter-a"
+                    ></label>
+            <label for="parameter-b" class="parameter">B: <input type="text" name="b" id="parameter-b"
+                    ></label>
+            <label for="parameter-c1" class="parameter">C1: <input type="text" name="c1" id="parameter-c1"
+                    ></label>
+            <label for="parameter-c2" class="parameter">C2: <input type="text" name="c2" id="parameter-c2"
+                    ></label>
+            <label for="parameter-d" class="parameter">D: <input type="text" name="d" id="parameter-d"
+                    ></label>
+            <label for="parameter-e" class="parameter">E: <input type="text" name="e" id="parameter-e"
+                    ></label>
+            <input type="submit" value="Change configuration" class="pure-button pure-button-primary"
+                id="submit-button">
+        </form>
+    </div>
     <!-- Load in the Pts script after the HTML renders to avoid Pts bug -->
     <script>
         var tag = document.createElement("script");
         tag.src = "javascript/game_simulations.js";
         document.getElementsByTagName("head")[0].appendChild(tag);
     </script>
-
 </html>
