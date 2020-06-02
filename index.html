@@ -10,26 +10,39 @@
 </head>
 
 <body>
-    <div>
-        <div style="width: 800px; height: 600px; margin: 30px auto 0;" id="game_window">
-            <canvas id="pt"></canvas>
-        </div>
-        <div style="padding: 20px 0; font-family: sans-serif; font-size: 0.8em; color: #9ab; text-align: center;">
-            Limit cycle
+    <div id="game-window-and-controls-box">
+        <div id="gameplay-window-total">
+            <div id="game_window">
+                <canvas id="pt"></canvas>
+            </div>
         </div>
         <div id="parameter-control-box">
+            <button id="start-game">Start game</button>
             <form id="parameter-form">
                 <h2 id="form-header">Game parameters</h2>
-                <script type='text/javascript'>
-                    //TODO: make params responsive to game setting in game_simulations
-                    params = ['a', 'b', 'c1', 'c2', 'd', 'e', 'p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit'];
-                    for (p of params) {
-                        document.write(`
-                    <label for="parameter-${p}" class="parameter">
-                    ${p}: <input type="text" name="${p}" id="parameter-${p}">
-                    </label>`);
-                    }
-                </script>
+                <div class="settings">
+                    <script type='text/javascript'>
+                        //TODO: make params responsive to game setting in game_simulations
+                        paramsGameplay = ['a', 'b', 'c1', 'c2', 'd', 'e', 'p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit'];
+                        for (p of paramsGameplay) {
+                            document.write(`<label for="parameter-${p}" class="parameter">${p} </label>
+                    <input type="text" name="${p}" id="parameter-${p}">
+                    `);
+                        }
+                    </script>
+                </div>
+                <h2 id="form-header">Visual parameters</h2>
+                <div class="settings">
+                    <script type="text/javascript">
+                        //TODO: make params responsive to game setting in game_simulations
+                        paramsVisual = ['radius', 'timeScale', 'visualScale', 'outputScale', 'vectorFieldScale'];
+                        for (p of paramsVisual) {
+                            document.write(`<label for="parameter-${p}" class="parameter">${p} </label>
+                    <input type="text" name="${p}" id="parameter-${p}">
+                    `);
+                        }
+                    </script>
+                </div>
                 <input type="submit" value="Change configuration" class="pure-button pure-button-primary"
                     id="submit-button">
             </form>

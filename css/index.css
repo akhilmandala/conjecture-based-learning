@@ -1,18 +1,40 @@
-#parameter-control-box {
-    margin: 5vh auto;
-    padding: 10px;
-    width: 30vw;
-    border: 1px solid black;
-}
-
-#parameter-control-box a {
-    display: block;
-}
-
-#parameter-form label {
-    display: block;
-}
-
 body {
     font-family: 'Open Sans', sans-serif;
+}
+
+#game-window-and-controls-box {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 100%;
+}
+
+#gameplay-window-total {
+    width: 60%;
+    flex: 3 3 auto;
+}
+
+#game_window {
+    height:100%;
+}
+
+#parameter-control-box {
+    width: 40%;
+    height: 100%;
+    flex: 1 1 auto;
+    padding: 20px;
+}
+
+.settings {
+    display:grid;
+    grid-template-columns: max-content max-content;
+    grid-gap:5px;
+}
+
+.settings label       { text-align:right; }
+
+.settings label:after { content: ":"; }
+
+#submit-button {
+    margin-top: 3vh;
 }
