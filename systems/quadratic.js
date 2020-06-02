@@ -1,16 +1,18 @@
+import { poly_barrier } from './helpers.js'
 // Quadratic game
 
+//TODO: make this more responsive
 var ScalarQuadraticParameterList = ['a', 'b', 'c1', 'c2', 'd', 'e'];
 
 class ScalarQuadraticGame {
-    constructor(parameters) {
-        this.parameters = parameters;
-        this.player1 = new Player1(parameters);
-        this.player2 = new Player2(parameters);
+    constructor(gameplayParameters) {
+        this.gameplayParameters = gameplayParameters;
+        this.player1 = new Player1(gameplayParameters);
+        this.player2 = new Player2(gameplayParameters);
     }
 
     fixedPoint() {
-        const { a, b, c1, c2, d, e } = this.parameters;
+        const { a, b, c1, c2, d, e } = this.gameplayParameters;
         return [-(b * d - c1 * e) / (a * b - c1 * c2),
             -(c2 * d - a * e) / (-a * b + c1 * c2)];
     }
@@ -34,6 +36,8 @@ class ScalarQuadraticGame {
     }
 }
 
+
+
 class Player1 {
     constructor(player_parameters) {
         this.parameters = player_parameters;
@@ -45,8 +49,8 @@ class Player1 {
     }
 
     update1(x, y) {
-        const {a, c1, d} = this.parameters;
-        return a * x + c1 * y + d;
+        const { a, c1, d, p1LearningRate, barrier, xLimit } = this.parameters;
+        return p1LearningRate * (a * x + c1 * y + d + barrier * poly_barrier(x, -xLimit, xLimit));
     }
 
     bestresponse1(y) {
@@ -66,8 +70,8 @@ class Player2 {
     }
 
     update2(x, y) {
-        const {b, c2, e} = this.parameters;
-        return b * y + c2 * x + e;
+        const { b, c2, e, p2LearningRate, barrier, yLimit } = this.parameters;
+        return p2LearningRate * (b * y + c2 * x + e + barrier * poly_barrier(y, -yLimit, yLimit));
     }
 
     bestresponse2(x) {

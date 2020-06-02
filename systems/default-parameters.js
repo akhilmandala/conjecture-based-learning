@@ -19,7 +19,8 @@ const DEFAULT_VISUAL_PARAMETERS = {
     timeScale: 1/1000,
     visualScale: 100,
     outputScale: 100,
-    vectorFieldScale: 10
+    vectorFieldScale: 10,
+
 }
 
 const DEFAULT_SIMULATION_SETTING = true;

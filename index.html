@@ -1,4 +1,5 @@
 <html>
+
 <head>
     <script src="https://unpkg.com/pts/dist/pts.min.js"></script>
     <script src="https://unpkg.com/tone"></script>
@@ -7,35 +8,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
     <!-- JS -->
 </head>
+
 <body>
-    <div style="width: 800px; height: 600px; margin: 30px auto 0;" id="game_window">
-        <canvas id="pt"></canvas>
-    </div>
-    <div style="padding: 20px 0; font-family: sans-serif; font-size: 0.8em; color: #9ab; text-align: center;">
-        Limit cycle
-    </div>
-    <div id="parameter-control-box">
-        <form id="parameter-form">
-            <h2 id="form-header">Game parameters</h2>
-            <script type='text/javascript'>
-                //TODO: make params responsive to game setting in game_simulations
-                params = ['a','b','c1','c2','d','e', 'p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit'];
-                for (p of params) {
-                    document.write(`
+    <div>
+        <div style="width: 800px; height: 600px; margin: 30px auto 0;" id="game_window">
+            <canvas id="pt"></canvas>
+        </div>
+        <div style="padding: 20px 0; font-family: sans-serif; font-size: 0.8em; color: #9ab; text-align: center;">
+            Limit cycle
+        </div>
+        <div id="parameter-control-box">
+            <form id="parameter-form">
+                <h2 id="form-header">Game parameters</h2>
+                <script type='text/javascript'>
+                    //TODO: make params responsive to game setting in game_simulations
+                    params = ['a', 'b', 'c1', 'c2', 'd', 'e', 'p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit'];
+                    for (p of params) {
+                        document.write(`
                     <label for="parameter-${p}" class="parameter">
                     ${p}: <input type="text" name="${p}" id="parameter-${p}">
                     </label>`);
-                }
-            </script>
-            <input type="submit" value="Change configuration" class="pure-button pure-button-primary"
-                id="submit-button">
-        </form>
+                    }
+                </script>
+                <input type="submit" value="Change configuration" class="pure-button pure-button-primary"
+                    id="submit-button">
+            </form>
+        </div>
+        <!-- Load in the Pts script after the HTML renders to avoid Pts bug -->
+        <script>
+            var tag = document.createElement("script");
+            tag.src = "javascript/game_simulations.js";
+            tag.type = "module";
+            document.getElementsByTagName("head")[0].appendChild(tag);
+        </script>
     </div>
-    <!-- Load in the Pts script after the HTML renders to avoid Pts bug -->
-    <script>
-        var tag = document.createElement("script");
-        tag.src = "javascript/game_simulations.js";
-        tag.type = "module";
-        document.getElementsByTagName("head")[0].appendChild(tag);
-    </script>
+</body>
+
 </html>
