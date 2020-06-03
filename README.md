@@ -1,0 +1,1 @@
+A platform to run game and collect data about game progression. Animations made using Pts.js library. Will write instructions about running locally when server-side code is implemented.
