@@ -2,6 +2,7 @@
 
 <head>
     <script src="https://unpkg.com/pts/dist/pts.min.js"></script>
+    <script src="https://unpkg.com/mathjs@7.0.1/dist/math.min.js"></script>
     <script src="https://unpkg.com/tone"></script>
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="css/index.css">
@@ -22,15 +23,41 @@
                 <h2 id="form-header">Game parameters</h2>
                 <div class="settings">
                     <script type='text/javascript'>
+                        function update() {
+                            a = parseFloat(document.getElementById('parameter-a').value);
+                            b = parseFloat(document.getElementById('parameter-b').value);
+                            c1 = parseFloat(document.getElementById('parameter-c1').value);
+                            c2 = parseFloat(document.getElementById('parameter-c2').value);
+
+                            let trace = -(a+b);
+                            let det = -(a*b-c1*c2);
+                            let J = math.matrix([[a,c1],[c2,b]]);
+                            let e = math.eigs(J);
+
+                            document.getElementById('determinant').innerHTML = det;
+                            document.getElementById('trace').innerHTML = trace;
+                            document.getElementById('eigenvalue1').innerHTML = e.values[0];
+                            document.getElementById('eigenvalue2').innerHTML = e.values[1];
+
+                        }
                         //TODO: make params responsive to game setting in game_simulations
                         paramsGameplay = ['a', 'b', 'c1', 'c2', 'd', 'e', 'p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit'];
                         for (p of paramsGameplay) {
                             document.write(`<label for="parameter-${p}" class="parameter">${p} </label>
-                    <input type="text" name="${p}" id="parameter-${p}">
-                    `);
+                             <input type="number" onchange="update()" name="${p}" id="parameter-${p}">`);
                         }
+
                     </script>
-                </div>
+                    <label>Det(J)</label>                
+                    <span id="determinant"></span>
+                    <label>Trace(J)</label>
+                    <span id="trace"></span>
+                    <label>Eigs(J)</label>                
+                    <span id="eigenvalue1"></span>                       <label></label>                  
+                    <span id="eigenvalue2"></span>
+                    <!-- <label>Trace(J)</label>
+                    <span id="trace"></span> -->
+                    </div>
                 <h2 id="form-header">Visual parameters</h2>
                 <div class="settings">
                     <script type="text/javascript">
@@ -53,6 +80,9 @@
             tag.src = "javascript/game_simulations.js";
             tag.type = "module";
             document.getElementsByTagName("head")[0].appendChild(tag);
+
+            // load calculations
+            update();
         </script>
     </div>
 </body>
