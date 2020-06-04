@@ -31,13 +31,13 @@
 
                             let trace = -(a+b);
                             let det = -(a*b-c1*c2);
-                            let J = math.matrix([[a,c1],[c2,b]]);
-                            let e = math.eigs(J);
+                            // let J = math.matrix([[a,c1],[c2,b]]);
+                            // let e = math.eigs(J);
 
                             document.getElementById('determinant').innerHTML = det;
                             document.getElementById('trace').innerHTML = trace;
-                            document.getElementById('eigenvalue1').innerHTML = e.values[0];
-                            document.getElementById('eigenvalue2').innerHTML = e.values[1];
+                            // document.getElementById('eigenvalue1').innerHTML = e.values[0];
+                            // document.getElementById('eigenvalue2').innerHTML = e.values[1];
 
                         }
                         //TODO: make params responsive to game setting in game_simulations
