@@ -1,6 +1,5 @@
 import { poly_barrier } from './helpers.js'
 // Quadratic game
-
 //TODO: make this more responsive
 var ScalarQuadraticParameterList = ['a', 'b', 'c1', 'c2', 'd', 'e'];
 
@@ -10,6 +9,7 @@ class ScalarQuadraticGame {
         this.visualParameters = visualParameters;
         this.player1 = new Player1(gameplayParameters);
         this.player2 = new Player2(gameplayParameters);
+        this.dataPoints = [];
     }
 
     fixedPoint() {
@@ -34,6 +34,11 @@ class ScalarQuadraticGame {
     conjectureP2(x, y) {
         return this.player1.update1(x, y);
         // + lrconj2 * Dy_conj2(x,y) * Dx_cost2(x,y)
+    }
+
+    returnGameData() {
+        console.log("points");
+        return this.dataPoints;
     }
 
     game_loop(space) {
@@ -78,6 +83,8 @@ class ScalarQuadraticGame {
 
         var vectorfield, vectorfield_pts;
 
+        var timestamp;
+
         br1 = Group.fromArray([toScreen(this.player1.bestresponse1(ymin), ymin),
         toScreen(this.player1.bestresponse1(ymax), ymax)]);
         br2 = Group.fromArray([toScreen(xmin, this.player2.bestresponse2(xmin)),
@@ -112,6 +119,8 @@ class ScalarQuadraticGame {
                     });
 
                 vectorfield_pts = Create.gridPts(bound, 30, 30);
+
+                timestamp = performance.now();
             },
 
             animate: (time, ftime) => {
@@ -129,6 +138,14 @@ class ScalarQuadraticGame {
                     x = x - dt * this.advanceP1(x, y);
                     y = input.y;
                 }
+
+                //log data point
+                this.dataPoints.push({
+                    x,
+                    y,
+                    timestamp: timestamp
+                });
+                timestamp = performance.now();
 
                 history.push(new Pt(x, y));
                 currentAction = Circle.fromCenter(toScreen(x, y), PLAYER_ACTION_RADIUS);

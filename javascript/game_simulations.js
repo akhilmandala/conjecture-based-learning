@@ -29,6 +29,21 @@ window.addEventListener('load', function initializeGameLoop(event) {
 
     //TODO: move function and required imports/variables into Game class (makes platform more responsive?)
     //Generates and returns an IPlayer object for Pts, which encodes update functions and animation functions.
+
+    //Adding listener here to keep "space" accessible, should try to figure out
+    //better way
+    this.document.addEventListener('keyup', function (event) {
+        if (event.ctrlKey && event.key === 'b') {
+            event.preventDefault();
+            space.pause();
+            handleGameEnd();
+        }
+    });
+
+    function handleGameEnd() {
+        var datapoints = GameState.returnGameData();
+        //Handle game export
+    }
 })
 
 //TODO: map cost function to oscillator better.
@@ -55,9 +70,9 @@ function initCanvas() {
     });
     return space;
 }
+
 function attachListeners() {
     //Set parameter values
-
     const parameterForm = document.getElementById("parameter-form");
     parameterForm.addEventListener('submit', function (event) {
         loadGameParameters();
