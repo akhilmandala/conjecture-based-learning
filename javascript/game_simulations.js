@@ -14,7 +14,7 @@ window.addEventListener('load', function initializeGameLoop(event) {
 
 const parameterForm = document.getElementById("parameter-form");
 parameterForm.onchange = function () {
-    parameters = loadGameParametersFromForm();
+    var parameters = loadGameParametersFromForm();
     GameState.updateParameters(parameters);
     GameState.startNewGameLoop();
 }

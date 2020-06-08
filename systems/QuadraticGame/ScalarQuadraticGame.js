@@ -87,7 +87,9 @@ ScalarQuadraticGame._generateGameController = function () {
     //could lead to some more interesting dynamics?
     var { visualScale, PLAYER_ACTION_RADIUS, COLOR_P1, COLOR_P2 } = this.parameters.visualParameters;
     var ancillaryGameInformation = {};
-    const PATH_COLORS = ["#95e1d3", "#eaffd0", "#fce38a", "#f38181"];
+
+    //Better solution would be to randomly generate hex numbers #XXXX00 
+    const PATH_COLORS = ["#95e1d3", "#eaffd0", "#fce38a", "#f38181", "#639fab", "fcf300", "eb5160", "b7999c"];
 
     //Origin and current action circles
     var form = this.space.getForm();
@@ -120,7 +122,7 @@ ScalarQuadraticGame._generateGameController = function () {
             form.fillOnly("#ccc").points(vectorfield_pts, 1);
 
             for (let i = 0; i < this.historyIndex.length; i++) {
-                form.strokeOnly(PATH_COLORS[i], 2).line((this.historyIndex[i]).map((p) => toScreen(p)));
+                form.strokeOnly(PATH_COLORS[i % PATH_COLORS.length], 2).line((this.historyIndex[i]).map((p) => toScreen(p)));
             }
         },
     }
