@@ -1,4 +1,3 @@
-
 function log_barrier(x, min, max) {
 		//return 0;
 		return 1 / (x - min) - 1 / (max - x);
