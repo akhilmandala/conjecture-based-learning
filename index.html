@@ -41,7 +41,7 @@
 
                         }
                         //TODO: make params responsive to game setting in game_simulations
-                        paramsGameplay = ['a', 'b', 'c1', 'c2', 'd', 'e', 'p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit'];
+                        paramsGameplay = ['a', 'b', 'c1', 'c2', 'd', 'e', 'p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit', 'isSimulating'];
                         for (p of paramsGameplay) {
                             document.write(`<label for="parameter-${p}" class="parameter">${p} </label>
                              <input type="number" onchange="update()" name="${p}" id="parameter-${p}">`);
@@ -62,7 +62,7 @@
                 <div class="settings">
                     <script type="text/javascript">
                         //TODO: make params responsive to game setting in game_simulations
-                        paramsVisual = ['radius', 'timeScale', 'visualScale', 'outputScale', 'vectorFieldScale'];
+                        paramsVisual = ['radius', 'timeScale', 'visualScale', 'outputScale', 'vectorFieldScale', 'COLOR_P1', 'COLOR_P2', 'PLAYER_ACTION_RADIUS', 'ORIGIN_RADIUS'];
                         for (p of paramsVisual) {
                             document.write(`<label for="parameter-${p}" class="parameter">${p} </label>
                     <input type="text" name="${p}" id="parameter-${p}">

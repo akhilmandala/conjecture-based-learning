@@ -7,7 +7,6 @@ window.addEventListener('load', function initializeGameLoop(event) {
 
     //markers for game changes/updates in one sitting
     var history = new Group();
-    var numberGameStateChanges = 0;
 
     //experimental stuff - need to update for better coding practices
     var historyIndex = [];
@@ -15,27 +14,14 @@ window.addEventListener('load', function initializeGameLoop(event) {
 
     //Load parameters
     var parameters = initializeParameters();
-    initializeParameterForm();
-
     var GameState = Object.create(ScalarQuadraticGame);
-    GameState.setupGame(parameters, 'sim');
-
     var controller = game_loop(space);
+    
+    initializeParameterForm();
+    GameState.setupGame(parameters, 'sim');
     loadGameController(controller);
 
-    this.document.addEventListener('keyup', function (event) {
-        if (event.ctrlKey && event.key === 'b') {
-            event.preventDefault();
-            space.pause();
-            handleGameEnd();
-        }
-    });
-
     const parameterForm = document.getElementById("parameter-form");
-
-    parameterForm.addEventListener('submit', function (event) {
-        loadGameParameters();
-    });
 
     parameterForm.onchange = function () {
         numberGameStateChanges++;
@@ -58,84 +44,31 @@ window.addEventListener('load', function initializeGameLoop(event) {
         loadGameController(newController);
     }
 
-    const startGameButton = document.getElementById("start-game");
-    startGameButton.addEventListener('click', function () {
-        console.log("pressed");
-        loadGameController(controller);
-    });
-
-    document.addEventListener('keyup', function (event) {
-        if (event.ctrlKey && event.key === 't') {
-            event.preventDefault();
-            isSimulating = !isSimulating;
-            console.log(isSimulating)
-        } else if (event.ctrlKey && event.key === 'b') {
-            event.preventDefault();
-        }
-    });
-
     function loadGameController(controller) {
         space.add(controller);
         // bind mouse events and play animation
         space.bindMouse().bindTouch().play();
     };
 
-    function handleGameEnd() {
-        var datapoints = GameState.returnGameData();
-        //Handle game export
-        return datapoints;
-    }
-
     function game_loop(space) {
-        //Since each player is an object that we add to the space, it's possible we can make each player their own object
-        //could lead to some more interesting dynamics?
-
-        // TODO: Link constant parameters to HTML doc
-        const HEIGHT = document.getElementById("gameplay-window-total").offsetHeight;
-        const WIDTH = document.getElementById("gameplay-window-total").offsetWidth;
-        const ORIGIN_RADIUS = 10;
-        const PLAYER_ACTION_RADIUS = 5;
-        const COLOR_P1 = "#e63946";
-        const COLOR_P2 = "#ffba08";
-        var isSimulating = true;
-
-        var { x0, y0, barrier } = parameters.gameplayParameters;
-        var { timeScale, visualScale, vectorFieldScale } = parameters.visualParameters;
-
-        // Centers of canvas, updated at init
-        var yCenter = HEIGHT / 2;
-        var xCenter = WIDTH / 2;
-        // Starting conditions
-        var x = x0;
-        var y = y0;
-        // Overall game project
-
-        var timestamp;
-
-        //TODO: Transfer below variables into QuadraticGameFile
-        //Drawing stable lines
-        var xmin = -1 * barrier; // autodetect this
-        var xmax = barrier;  // 
-        var ymin = -1 * barrier;
-        var ymax = barrier;
-
         var br1, br2;
         var fixed, origin;
         var currentAction;
         var vectorfield, vectorfield_pts;
 
-        //Origin and current action circles
-        var form = space.getForm();
-        form._ctx = space.ctx;
-
         function loadGameVisuals() {
+            var xmin = -1 * barrier; // autodetect this
+            var xmax = barrier;  // 
+            var ymin = -1 * barrier;
+            var ymax = barrier;
+
             br1 = Group.fromArray([toScreen(new Pt(GameState.playerOne.bestResponse(ymin), ymin)),
-                toScreen(new Pt(GameState.playerOne.bestResponse(ymax), ymax))]);
+            toScreen(new Pt(GameState.playerOne.bestResponse(ymax), ymax))]);
             br2 = Group.fromArray([toScreen(new Pt(xmin, GameState.playerTwo.bestResponse(xmin))),
-                toScreen(new Pt(xmax, GameState.playerTwo.bestResponse(xmax)))]);
+            toScreen(new Pt(xmax, GameState.playerTwo.bestResponse(xmax)))]);
             fixed = new Pt(GameState.fixedPoint());
             origin = Circle.fromCenter(toScreen(fixed.x, fixed.y), ORIGIN_RADIUS);
-            currentAction = Circle.fromCenter(toScreen(x, y), PLAYER_ACTION_RADIUS);
+            currentAction = Circle.fromCenter(toScreen(new Pt(GameState.currentAction)), PLAYER_ACTION_RADIUS);
             vectorfield = Create.gridPts(space.innerBound, 30, 30).map(
                 (p) => {
 
@@ -156,11 +89,37 @@ window.addEventListener('load', function initializeGameLoop(event) {
             vectorfield_pts = Create.gridPts(space.innerBound, 30, 30);
         }
 
-        const GameExecutionController = {
+        const yCenter = document.getElementById("gameplay-window-total").offsetHeight / 2;
+        const xCenter = document.getElementById("gameplay-window-total").offsetWidth / 2;
+
+        // Transformation functions
+        function fromScreen(pt) {
+            var x = pt.x;
+            var y = pt.y;
+
+            return new Pt((x - xCenter) / visualScale, -(y - yCenter) / visualScale);
+        }
+
+        function toScreen(pt) {
+            var x = pt.x;
+            var y = pt.y;
+
+            return new Pt(x * visualScale + xCenter, -y * visualScale + yCenter);
+        }
+
+        //Since each player is an object that we add to the space, it's possible we can make each player their own object
+        //could lead to some more interesting dynamics?
+        var { barrier, isSimulating } = parameters.gameplayParameters;
+        var { visualScale, vectorFieldScale, ORIGIN_RADIUS, PLAYER_ACTION_RADIUS, COLOR_P1, COLOR_P2 } = parameters.visualParameters;
+
+        //Origin and current action circles
+        var form = space.getForm();
+
+        //Not an ideal operation but fixes bug -- force-setting form canvas contex to be space ctx
+        form._ctx = space.ctx;
+
+        return {
             start: (bound) => {
-                y = y0;
-                x = x0;
-                timestamp = performance.now();
                 loadGameVisuals();
                 history = new Group();
                 historyIndex.push(history);
@@ -172,10 +131,9 @@ window.addEventListener('load', function initializeGameLoop(event) {
                 }
 
                 GameState.step();
-
                 var newPt = new Pt(GameState.currentAction);
-
                 history.push(newPt);
+
                 currentAction = Circle.fromCenter(toScreen(newPt), PLAYER_ACTION_RADIUS);
 
                 form.strokeOnly(COLOR_P1, 2).line(br1);
@@ -188,22 +146,6 @@ window.addEventListener('load', function initializeGameLoop(event) {
                     form.strokeOnly(PATH_COLORS[i], 2).line((historyIndex[i]).map((p) => toScreen(p)));
                 }
             },
-        }
-
-        return GameExecutionController;
-
-        //Helper functions
-        // Transformation functions
-        function fromScreen(pt) {
-            var x = pt.x;
-            var y = pt.y;
-            return new Pt((x - xCenter) / visualScale, -(y - yCenter) / visualScale);
-        }
-
-        function toScreen(pt) {
-            var x = pt.x;
-            var y = pt.y;
-            return new Pt(x * visualScale + xCenter, -y * visualScale + yCenter);
         }
     }
 })

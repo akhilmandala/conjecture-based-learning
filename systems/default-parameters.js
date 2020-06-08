@@ -12,6 +12,7 @@ const DEFAULT_GAMEPLAY_PARAMETERS = {
     barrier: 100,
     xLimit: 3.8/1.1,
     yLimit: 2.1/1.1,
+    isSimulating: true,
 }
 
 const DEFAULT_VISUAL_PARAMETERS = {
@@ -20,7 +21,10 @@ const DEFAULT_VISUAL_PARAMETERS = {
     visualScale: 100,
     outputScale: 100,
     vectorFieldScale: 10,
-
+    COLOR_P1: "#e63946",
+    COLOR_P2: "#ffba08",
+    PLAYER_ACTION_RADIUS: 5,
+    ORIGIN_RADIUS: 10,
 }
 
 const DEFAULT_SIMULATION_SETTING = true;
