@@ -11,14 +11,24 @@ var ScalarQuadraticGame = Object.create(Game);
  */
 ScalarQuadraticGame.setupGame = function (parameters, mode, space) {
     this.init(parameters);
-    this.history = new Group();
-    this.historyIndex = [];
+    
     this.mode = mode;
-    this.space = space;
-    this.playerOne = Object.create(QuadraticMachineX);
-    this.playerTwo = Object.create(QuadraticMachineY);
     this.currentAction = [parameters.gameplayParameters.x0, parameters.gameplayParameters.y0];
 
+    this.historyIndex = [];
+    this.history = new Group();
+    this.historyIndex[0] = this.history;
+    
+    this.dataIndex = [];
+    this.dataIndex[0] = {
+        dataPoints: this.dataPoints,
+        parameters
+    };
+
+    this.space = space;
+    
+    this.playerOne = Object.create(QuadraticMachineX);
+    this.playerTwo = Object.create(QuadraticMachineY);
     this.playerOne.createPlayer(parameters.gameplayParameters, this.currentAction[0]);
     this.playerTwo.createPlayer(parameters.gameplayParameters, this.currentAction[1]);
 };
@@ -31,6 +41,11 @@ ScalarQuadraticGame.startNewGameLoop = function () {
     this.space.removeAll();
     this.space.add(controller);
     this.space.bindMouse().bindTouch().play();
+}
+
+ScalarQuadraticGame.endGame = function() {
+    this.space.removeAll();
+    return this.dataIndex;
 }
 
 /**
@@ -48,6 +63,13 @@ ScalarQuadraticGame.updateParameters = function(parameters) {
     var newHistory = new Group();
     this.historyIndex.push(newHistory);
     this.history = newHistory;
+
+    var newDataObject = {
+        dataPoints: [],
+        parameters
+    };
+    this.dataIndex.push(newDataObject);
+    this.dataPoints = newDataObject.dataPoints;
 }
 
 /**
@@ -105,13 +127,14 @@ ScalarQuadraticGame._generateGameController = function () {
         },
 
         animate: (time, ftime) => {
-            if (!ancillaryGameInformation.vectorfield) {
+            if (this.history.length === 0) {
                 ancillaryGameInformation = this._createPtsFunctionVisualizations(this.space);
             }
 
             this._step();
             var newPt = new Pt(this.currentAction);
             this.history.push(newPt);
+            this.dataPoints.push([newPt.x, newPt.y]);
             var {br1, br2, origin, vectorfield, vectorfield_pts} = ancillaryGameInformation;
             var currentAction = Circle.fromCenter(toScreen(newPt), PLAYER_ACTION_RADIUS);
             form.strokeOnly(COLOR_P1, 2).line(br1);

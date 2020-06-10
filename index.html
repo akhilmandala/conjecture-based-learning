@@ -19,6 +19,8 @@
         </div>
         <div id="parameter-control-box">
             <button id="start-game">Start game</button>
+            <button id="end-game">End game</button>
+            <button id="start-multi-stage-simulation">Multi-stage simulators</button>
             <form id="parameter-form">
                 <h2 id="form-header">Game parameters</h2>
                 <div class="settings">
@@ -29,8 +31,8 @@
                             c1 = parseFloat(document.getElementById('parameter-c1').value);
                             c2 = parseFloat(document.getElementById('parameter-c2').value);
 
-                            let trace = -(a+b);
-                            let det = -(a*b-c1*c2);
+                            let trace = -(a + b);
+                            let det = -(a * b - c1 * c2);
                             // let J = math.matrix([[a,c1],[c2,b]]);
                             // let e = math.eigs(J);
 
@@ -48,16 +50,16 @@
                         }
 
                     </script>
-                    <label>Det(J)</label>                
+                    <label>Det(J)</label>
                     <span id="determinant"></span>
                     <label>Trace(J)</label>
                     <span id="trace"></span>
-                    <label>Eigs(J)</label>                
-                    <span id="eigenvalue1"></span>                       <label></label>                  
+                    <label>Eigs(J)</label>
+                    <span id="eigenvalue1"></span> <label></label>
                     <span id="eigenvalue2"></span>
                     <!-- <label>Trace(J)</label>
                     <span id="trace"></span> -->
-                    </div>
+                </div>
                 <h2 id="form-header">Visual parameters</h2>
                 <div class="settings">
                     <script type="text/javascript">
@@ -74,17 +76,18 @@
                     id="submit-button">
             </form>
         </div>
-        <!-- Load in the Pts script after the HTML renders to avoid Pts bug -->
-        <script>
-            var tag = document.createElement("script");
-            tag.src = "javascript/game_simulations.js";
-            tag.type = "module";
-            document.getElementsByTagName("head")[0].appendChild(tag);
-
-            // load calculations
-            update();
-        </script>
     </div>
+    <div id="div1">The text above has been created dynamically.</div>
+    <!-- Load in the Pts script after the HTML renders to avoid Pts bug -->
+    <script>
+        var tag = document.createElement("script");
+        tag.src = "javascript/game_simulations.js";
+        tag.type = "module";
+        document.getElementsByTagName("head")[0].appendChild(tag);
+
+        // load calculations
+        update();
+    </script>
 </body>
 
 </html>
