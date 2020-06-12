@@ -1,0 +1,104 @@
+<html>
+  <head><script src="https://unpkg.com/pts/dist/pts.min.js"></script></head>
+	<script src="https://unpkg.com/mathjs@7.0.1/dist/math.min.js"></script>
+
+  <body style="font-family: sans-serif; margin: 0; background-color: black;">
+    <div id="pt" style="width: 800px; height: 800px; margin: 30px auto 0;"></div>
+     </div>
+
+    <script>
+
+
+(function() {
+  
+	Pts.quickStart( "#pt", "#000" );
+	
+	// visual scale
+	var forward = 400;
+	var scale_x = 200;
+
+	// system constants
+	var h1 = 0.0001;
+	var h2 = 0.001;
+	var k1 = 0.1;
+
+	var t = -forward; // time
+	var x = 0; // position
+	var v = 0; // velocity
+	var u = 0; // action
+
+	// Mode: first order, second order, or simulation
+	var mode = "first";
+	//var mode = "first";
+	//var mode = "second";
+	//var mode = "sim";
+
+	// Reference signal: sum of sines, square wave..
+	var ref = "sine";
+	//var ref = "square";
+
+	var group = new Group(new Pt(0,0));
+
+	function reference(t) {
+		if (ref == "sine")
+			return .5*math.sin(t/30) + .5*math.sin(t/50);
+		if (ref == "square") 
+			return (math.round(t/200 % 2)==1)-.5;
+	}
+	
+	function step(){
+		// control
+		u = space.pointer.x -space.width/2;
+		if (mode == "zero")	{
+			x = u/scale_x;
+		}
+		if (mode == "first")	{
+			x = x + h1*u;
+		}
+		else if (mode == "second")	{
+			v = v + h2*u
+			x = x + h2*v;
+		}
+		else if (mode == "sim"){
+			x = x - k1*(x-reference(t));
+		}	
+
+		x = math.max(math.min(x, 2), -2); 
+
+		// append data point to graphics
+		if(t % 5 == 0) {
+			group.push(new Pt(reference(t+forward), t+forward));
+			if(group.length >= 180) {
+				group.shift();
+			}
+		}
+		t += 1;
+	}
+
+	function toScreen(pt) {
+		return new Pt(pt.x*scale_x + space.width/2, (-pt.y + t + forward) - 5 );
+	}
+  
+  space.add({
+    animate: (time, ftime)  => {				
+			form.stroke("#333", 10, "round").line(new Group(new Pt(space.width/2, space.height-5), new Pt(space.width/2+u, space.height-5)));
+
+			form.strokeOnly("#f1a340", 5, "round");
+			form.line(group.map(toScreen));
+			form.fillOnly("#9983c3").point(toScreen(new Pt(x, t)), 10, "circle");
+    }
+  });
+
+  //// ----  
+
+	space.bindMouse().bindTouch().play();
+	for(var i = 0; i <= forward; i++) {
+		step();
+	}
+	setInterval(step, 12);
+
+})();
+
+    </script>
+  </body>
+</html>
