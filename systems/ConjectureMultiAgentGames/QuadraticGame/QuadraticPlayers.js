@@ -1,4 +1,4 @@
-import {Player} from '../GameObject.js'
+import {Player} from '../ConjectureMultiAgentGame.js'
 import { poly_barrier } from './helpers.js'
 /**
  * QUADRATIC GAME - PLAYER FUNCTIONS

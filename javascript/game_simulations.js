@@ -1,10 +1,17 @@
-import { ScalarQuadraticGame } from '../systems/QuadraticGame/ScalarQuadraticGame.js';
-import DEFAULT_PARAMETERS from '../systems/QuadraticGame/default-parameters.js';
+import { ScalarQuadraticGame, SCALAR_QUADRATIC_GAME_CONFIGURABLE_CONSTANTS } from '../systems/ConjectureMultiAgentGames/QuadraticGame/ScalarQuadraticGame.js'
+import {ScalarQuarticGame} from '../systems/ConjectureMultiAgentGames/QuarticGame/ScalarQuarticGame.js'
+import DEFAULT_PARAMETERS from '../systems/ConjectureMultiAgentGames/QuarticGame/default-parameters.js';
 Pts.namespace(window);
 
-var GameState = Object.create(ScalarQuadraticGame);
+const CONJECTURE_MULTIAGENT_GAME_CONSTANTS = ['p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit', 'isSimulating'];
+
+var GameState = Object.create(ScalarQuarticGame);
 var space = initCanvas();
-var parameters = DEFAULT_PARAMETERS.calibrationParameters;
+var parameters = DEFAULT_PARAMETERS.quarticGameParameters;
+
+window.addEventListener('load', function(event) {
+    GameState.setupSpace(space);
+})
 
 const parameterForm = document.getElementById("parameter-form");
 parameterForm.onchange = function () {
@@ -16,14 +23,15 @@ parameterForm.onchange = function () {
 const startGameButton = document.getElementById("start-game");
 startGameButton.addEventListener("click", function (event) {
     event.preventDefault();
-    GameState.setupGame(parameters, 'sim', space);
-    GameState.startNewGameLoop();
+    GameState.setupGame(parameters, 'sim');
+    GameState.startGameLoop();
 })
 
 const endGameButton = document.getElementById("end-game");
 endGameButton.addEventListener("click", function (event) {
     event.preventDefault();
     var data = GameState.endGame();
+    loadGameDataIntoDocument(data);
 })
 
 const launchMultipleSimulationsButton = document.getElementById("start-multi-stage-simulation");

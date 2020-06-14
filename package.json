@@ -18,6 +18,7 @@
   "homepage": "https://github.com/akhilmandala/conjecture-based-learning#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "jsdoc": "^3.6.4",
     "pts": "^0.9.4"
   }
 }

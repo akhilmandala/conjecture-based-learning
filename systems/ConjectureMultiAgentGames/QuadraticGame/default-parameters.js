@@ -122,7 +122,7 @@ const DEFAULT_PARAMETERS = {
     stableParameters,
     unstableParameters,
     saddleParameters,
-    calibrationParameters
+    calibrationParameters,
 }
 
 export default DEFAULT_PARAMETERS;
