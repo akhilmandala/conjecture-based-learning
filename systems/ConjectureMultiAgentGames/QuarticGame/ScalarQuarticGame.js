@@ -1,6 +1,6 @@
 import { Game } from "../ConjectureMultiAgentGame.js";
 import { QuarticMachineX, QuarticMachineY } from './ScalarQuarticPlayers.js';
-import DEFAULT_PARAMETERS from './ScalarQuarticGameDefaultParameters.js';
+import DEFAULT_PARAMETERS from './default-parameters.js';
 // Quartic game
 // Section 5.A example: https://github.com/bchasnov/research/blob/master/papers/2020-ccabr-stability-of-nash.pdf
 
