@@ -1,3 +1,8 @@
+/**
+ * TODO:
+ * - spawn Worker to deal with agent calculations
+ */
+
 var Game = {
     init: function (parameters, mode = 'sim', playerOne, playerTwo) {
         this.parameters = parameters;
@@ -82,9 +87,6 @@ var Game = {
     
         var br2 = Group.fromArray([toScreen(new Pt(xmin, this.playerTwo.bestResponse(xmin))),
         toScreen(new Pt(xmax, this.playerTwo.bestResponse(xmax)))]);
-    
-        var fixed = new Pt(this._fixedPoint());
-        var origin = Circle.fromCenter(toScreen(fixed.x, fixed.y), ORIGIN_RADIUS);
     
         var currentAction = Circle.fromCenter(toScreen(new Pt(this.currentAction)), PLAYER_ACTION_RADIUS);
     
@@ -183,7 +185,6 @@ var Game = {
                 var currentAction = Circle.fromCenter(toScreen(newPt), PLAYER_ACTION_RADIUS);
                 this.form.strokeOnly(COLOR_P1, 2).line(br1);
                 this.form.strokeOnly(COLOR_P2, 2).line(br2);
-                this.form.fillOnly("#fff").circle(origin);
                 this.form.fill("#000").circle(currentAction);
                 this.form.strokeOnly("#ccc", 1).lines(vectorfield);
                 this.form.fillOnly("#ccc").points(vectorfield_pts, 1);

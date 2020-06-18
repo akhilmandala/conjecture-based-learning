@@ -1,11 +1,8 @@
-import { ScalarQuadraticGame, SCALAR_QUADRATIC_GAME_CONFIGURABLE_CONSTANTS } from '../systems/ConjectureMultiAgentGames/QuadraticGame/ScalarQuadraticGame.js'
-import {ScalarQuarticGame} from '../systems/ConjectureMultiAgentGames/QuarticGame/ScalarQuarticGame.js'
+import {QuarticGame} from '../systems/ConjectureMultiAgentGames/QuarticGame/QuarticGame.js'
 import DEFAULT_PARAMETERS from '../systems/ConjectureMultiAgentGames/QuarticGame/default-parameters.js';
 Pts.namespace(window);
 
-const CONJECTURE_MULTIAGENT_GAME_CONSTANTS = ['p1LearningRate', 'p2LearningRate', 'x0', 'y0', 'barrier', 'xLimit', 'yLimit', 'isSimulating'];
-
-var GameState = Object.create(ScalarQuarticGame);
+var GameState = Object.create(QuarticGame);
 var space = initCanvas();
 var parameters = DEFAULT_PARAMETERS.quarticGameParameters;
 
