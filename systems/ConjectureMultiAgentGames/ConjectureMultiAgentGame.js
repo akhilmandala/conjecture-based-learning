@@ -30,8 +30,8 @@ var Game = {
             "type": "triangle4",
             "volume": -40
         }).toMaster();
+
         this.osc.start();
-    
     },
     setupSpace: function (space) {
         this.space = space;
@@ -178,10 +178,9 @@ var Game = {
                 return;
         }
 
-        this.dataPoints.push(currentAction);
         this.currentAction = [x_out, y_out];
         var cost_p1 = this.playerOne.cost(x,y);
-        var freq = 10*f1*math.abs(cost_p1)+220;
+        var freq = 100*math.abs(cost_p1)+220;
         // var freq = 50*math.log(1000 * (f1+50));
         // var freq = math.exp(f1/10)+440;j
         // console.log("cost: "+f1);
@@ -223,8 +222,8 @@ var Game = {
                 this.dataPoints.push([performance.now(), this.parameters.gameplayParameters['d'], newPt.x, newPt.y]);
                 var {br1, br2, vectorfield, vectorfield_pts} = ancillaryGameInformation;
                 var currentAction = Circle.fromCenter(new Pt(toScreen(newPt.x, newPt.y)), PLAYER_ACTION_RADIUS);
-                this.form.strokeOnly(COLOR_P1, 2).line(br1);
-                this.form.strokeOnly(COLOR_P2, 2).line(br2);
+                // this.form.strokeOnly(COLOR_P1, 2).line(br1);
+                // this.form.strokeOnly(COLOR_P2, 2).line(br2);
                 this.form.fill("#000").circle(currentAction);
                 this.form.strokeOnly("#ccc", 1).lines(vectorfield);
                 this.form.fillOnly("#ccc").points(vectorfield_pts, 1);

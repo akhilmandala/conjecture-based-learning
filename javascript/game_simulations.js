@@ -34,7 +34,7 @@ function keyboardGameControls(e) {
         } else if (e.keyCode === 69) {
             event.preventDefault();
             var data = GameState.endGame();
-            loadGameDataIntoDocument(data);
+            loadGameDataIntoCSV(data);
         } else if (e.keyCode === 77) {
             event.preventDefault();
             launchCalibrationTest();
@@ -63,30 +63,20 @@ function initCanvas() {
     return space;
 }
 
-function loadGameDataIntoDocument(dataPoints) {
+function loadGameDataIntoCSV(dataPoints) {
     var totalGameData = dataPoints;
     var totalDataExport = "";
     var newDiv = document.createElement('div');
     
+    var csvContent = "data:text/csv;charset=utf-8,";
     for(let gameData of totalGameData) {
-        var rows = JSON.stringify(gameData.payload.parameters) + "\n";
-        appendStringAsPTag(rows, newDiv);
-        // let csvContent = "data:text/csv;charset=utf-8,";
-        // appendStringAsPTag(csvContent, newDiv);
-        for(var dataPoint of gameData.payload.dataPoints) {
-            var formattedDataPoint = dataPoint.map((action) => { return action.toFixed(3); });
-            var csvConvertedDataPoint = String(formattedDataPoint).substring(1, String(formattedDataPoint).length - 1);
-            appendStringAsPTag(csvConvertedDataPoint, newDiv);
+        for(let dataPoint of gameData.payload.dataPoints) {
+            let formattedDataPoint = dataPoint.map((action) => { return action.toFixed(5); });
+            let row = formattedDataPoint.join(",");
+            csvContent += formattedDataPoint + "\r\n";
         }
     }
 
-    var currentDiv = document.getElementById("div1");
-    document.body.insertBefore(newDiv, currentDiv);
-
-    function appendStringAsPTag(str, parentDiv) {
-        var node = document.createElement("p");
-        var textNode = document.createTextNode(str);
-        node.appendChild(textNode);
-        parentDiv.appendChild(node);
-    }
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);
 }
