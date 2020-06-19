@@ -1,11 +1,10 @@
-import {QuadraticGame} from '../systems/ConjectureMultiAgentGames/QuadraticGame/QuadraticGame.js'
+import {Game} from '../systems/ConjectureMultiAgentGames/ConjectureMultiAgentGame.js';
+import {QuadraticMachineX, QuadraticMachineY} from '../systems/ConjectureMultiAgentGames/QuadraticGame/QuadraticPlayers.js'
 import DEFAULT_PARAMETERS from '../systems/ConjectureMultiAgentGames/QuadraticGame/default-parameters.js';
-import { Game } from '../systems/ConjectureMultiAgentGames/ConjectureMultiAgentGame.js';
 Pts.namespace(window);
 
-var GameState = Object.create(QuadraticGame);
+var GameState = Object.create(Game);
 var space = initCanvas();
-var parameters = DEFAULT_PARAMETERS.calibrationParametersA;
 
 window.addEventListener('load', function(event) {
     GameState.setupSpace(space);
@@ -14,9 +13,6 @@ window.addEventListener('load', function(event) {
 window.addEventListener('keyup', keyboardGameControls);
 
 //Helper functions
-//Attaches listeners to buttons and keyboard for toggle events (loading parameters, starting game,
-//triggering simulations.)
-
 /**
  * Keyboard controls for game: 
  *  - ctrl + 's' => start game
@@ -27,35 +23,36 @@ function keyboardGameControls(e) {
     if(!!e.ctrlKey) {
         if(e.keyCode === 83) {
             event.preventDefault();
-            GameState.setupGame(parameters, 'p1-vs-sim');
-            GameState.startGameLoop();
+            GameState.init({
+                playerOne: QuadraticMachineX, 
+                playerTwo: QuadraticMachineY
+            });
+            GameState.startGameLoop({
+                parameters: DEFAULT_PARAMETERS.calibrationParametersA,
+                mode: 'p1-vs-sim'
+            });
         } else if (e.keyCode === 69) {
             event.preventDefault();
             var data = GameState.endGame();
             loadGameDataIntoDocument(data);
         } else if (e.keyCode === 77) {
             event.preventDefault();
-            console.log("game started");
-            launchMultipleSimulations();
+            launchCalibrationTest();
         }
     }
 }
 
-function launchMultipleSimulations() {
-        const { calibrationParametersA, calibrationParametersB } = DEFAULT_PARAMETERS;
-        GameState.setupGame(calibrationParametersA, 'p1-vs-sim', space);
-        GameState.startGameLoop();
-        for(let i = 1; i <= 10; i++) {
-            if (i % 2 == 0) {
-                setTimeout(function() {
-                    GameState.updateParameters(calibrationParametersB);
-                }, i * 2000);
-            } else {
-                setTimeout(function() {
-                    GameState.updateParameters(calibrationParametersA);
-                }, i * 2000);
-            }
-        }
+function launchCalibrationTest() {
+    GameState.init({
+        playerOne: QuadraticMachineX,
+        playerTwo: QuadraticMachineY,
+    });
+    GameState.launchExperiment({
+        numberOfTrials: 10,
+        trialDuration: 2000, //ms
+        mode: 'p1-v-sim',
+        parameterSets: [DEFAULT_PARAMETERS.calibrationParametersA, DEFAULT_PARAMETERS.calibrationParametersB]
+    });
 }
 
 //Creates a Pts space and canvas.
@@ -64,19 +61,6 @@ function initCanvas() {
         bgcolor: "#345", resize: true, retina: true
     });
     return space;
-}
-
-//TODO: map cost function to oscillator better.
-//Creates an Tone oscillator
-function initOscillator() {
-    synth.triggerAttack("C4");
-    var osc = new Tone.Oscillator({
-        "frequency": 261.626,
-        "type": "triangle4",
-        "volume": -60
-    }).toMaster();
-    osc.start();
-    return osc;
 }
 
 function loadGameDataIntoDocument(dataPoints) {

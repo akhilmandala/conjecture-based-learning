@@ -3,13 +3,18 @@
  * - spawn Worker to deal with agent calculations
  */
 
-var Game = {
-    init: function (parameters, mode = 'sim', playerOne, playerTwo) {
-        this.parameters = parameters;
-        this.dataIndex = [];
+ /**
+  * Pts/Game UI --> Game worker:
+  *     - parameters, game setting, experiment info
+  *     - user input
+  * Game worker --> Pts/Game UI:
+  *     - initial/immutable response data
+  *     - x, y
+  */
 
-        this.mode = mode;
-        this.currentAction = [parameters.gameplayParameters.x0, parameters.gameplayParameters.y0];
+var Game = {
+    init: function ({playerOne, playerTwo}) {
+        this.dataIndex = [];
 
         this.historyIndex = [];
         this.history = new Group();
@@ -19,16 +24,20 @@ var Game = {
 
         this.playerOne = Object.create(playerOne);
         this.playerTwo = Object.create(playerTwo);
-
-        this.playerOne.createPlayer(parameters.gameplayParameters, this.currentAction[0]);
-        this.playerTwo.createPlayer(parameters.gameplayParameters, this.currentAction[1]);
     },
     setupSpace: function (space) {
         this.space = space;
         this.form = space.getForm();
         this.form._ctx = space.ctx;
     },
-    startGameLoop: function () {
+    startGameLoop: function ({parameters, mode}) {
+        this.parameters = parameters;
+        this.mode = mode;
+        this.currentAction = [parameters.gameplayParameters.x0, parameters.gameplayParameters.y0];
+        
+        this.playerOne.createPlayer(parameters.gameplayParameters, this.currentAction[0]);
+        this.playerTwo.createPlayer(parameters.gameplayParameters, this.currentAction[1]);
+        
         var controller = this._generateGameIPlayer();
         this.space.removeAll();
         this.space.add(controller);
@@ -56,6 +65,18 @@ var Game = {
 
         this.dataPoints = [];
     },
+    launchExperiment: function({numberOfTrials, trialDuration, mode, parameterSets}) {
+        this.startGameLoop({
+            parameters: parameterSets[0],
+            mode: mode
+        });
+        for(let i = 1; i <= numberOfTrials; i++) {
+            var self = this;
+            setTimeout(function() {
+                self.updateParameters(parameterSets[i % parameterSets.length]);
+            }, i * trialDuration);
+        }
+    },
     _createFeatureVisualizations: function(space) {
         const yCenter = document.getElementById("gameplay-window-total").offsetHeight / 2;
         const xCenter = document.getElementById("gameplay-window-total").offsetWidth / 2;
@@ -68,8 +89,7 @@ var Game = {
             return [x * visualScale + xCenter, -y * visualScale + yCenter];
         }
 
-        var { barrier, isSimulating } = this.parameters.gameplayParameters;
-        var { ORIGIN_RADIUS, PLAYER_ACTION_RADIUS, visualScale, vectorFieldScale, ORIGIN_RADIUS } = this.parameters.visualParameters;
+        var { PLAYER_ACTION_RADIUS, visualScale, vectorFieldScale } = this.parameters.visualParameters;
     
         var xmin = -100; // autodetect this
         var xmax = 100;  // 
@@ -195,6 +215,15 @@ var Game = {
                 }
             },
         }
+    },
+    _addCurrentGameHistoryToData: function addGameToHistory() {
+        this.dataIndex.push({
+            id: Math.random(),
+            payload: {
+                dataPoints: this.dataPoints,
+                parameters: this.parameters,
+            }
+        })
     }
 }
 
