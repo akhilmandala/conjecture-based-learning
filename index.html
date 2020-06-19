@@ -18,10 +18,7 @@
             </div>
         </div>
         <div id="parameter-control-box">
-            <button id="start-game">Start game</button>
-            <button id="end-game">End game</button>
-            <button id="start-multi-stage-simulation">Multi-stage simulators</button>
-            <form id="parameter-form">
+            <!-- <form id="parameter-form">
                 <h2 id="form-header">Game parameters</h2>
                 <div class="settings">
                     <script type='text/javascript'>
@@ -57,8 +54,8 @@
                     <label>Eigs(J)</label>
                     <span id="eigenvalue1"></span> <label></label>
                     <span id="eigenvalue2"></span>
-                    <!-- <label>Trace(J)</label>
-                    <span id="trace"></span> -->
+                    <label>Trace(J)</label>
+                    <span id="trace"></span>
                 </div>
                 <h2 id="form-header">Visual parameters</h2>
                 <div class="settings">
@@ -74,7 +71,7 @@
                 </div>
                 <input type="submit" value="Change configuration" class="pure-button pure-button-primary"
                     id="submit-button">
-            </form>
+            </form> -->
         </div>
     </div>
     <div id="div1">The text above has been created dynamically.</div>
@@ -84,9 +81,6 @@
         tag.src = "javascript/game_simulations.js";
         tag.type = "module";
         document.getElementsByTagName("head")[0].appendChild(tag);
-
-        // load calculations
-        update();
     </script>
 </body>
 

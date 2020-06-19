@@ -1,8 +1,6 @@
 import { Game } from '../ConjectureMultiAgentGame.js'
 import { QuadraticMachineX, QuadraticMachineY } from './QuadraticPlayers.js';
 
-var SCALAR_QUADRATIC_GAME_CONFIGURABLE_CONSTANTS = ['a', 'b', 'c1', 'c2', 'd', 'e'];
-
 var QuadraticGame = Object.create(Game);
 
 /**
@@ -34,4 +32,4 @@ QuadraticGame._fixedPoint = function () {
     -(c2 * d - a * e) / (-a * b + c1 * c2)];
 }
 
-export { QuadraticGame as ScalarQuadraticGame, SCALAR_QUADRATIC_GAME_CONFIGURABLE_CONSTANTS };
+export { QuadraticGame };

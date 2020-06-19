@@ -20,7 +20,7 @@ QuarticMachineX.update = function(x, y) {
     return a * x + e * x * x * x + b * y;    
 }
 
-QuarticMachineX.bestResponse = function(x) {
+QuarticMachineX.bestResponseInv = function(x) {
     const {a, b, e} = this.parameters;
     // because the update is cubic, it is easier to compute the 
     // inverse best response instead of solving for the roots.

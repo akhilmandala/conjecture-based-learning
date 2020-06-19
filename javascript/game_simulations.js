@@ -1,66 +1,62 @@
-import {QuarticGame} from '../systems/ConjectureMultiAgentGames/QuarticGame/QuarticGame.js'
-import DEFAULT_PARAMETERS from '../systems/ConjectureMultiAgentGames/QuarticGame/default-parameters.js';
+import {QuadraticGame} from '../systems/ConjectureMultiAgentGames/QuadraticGame/QuadraticGame.js'
+import DEFAULT_PARAMETERS from '../systems/ConjectureMultiAgentGames/QuadraticGame/default-parameters.js';
+import { Game } from '../systems/ConjectureMultiAgentGames/ConjectureMultiAgentGame.js';
 Pts.namespace(window);
 
-var GameState = Object.create(QuarticGame);
+var GameState = Object.create(QuadraticGame);
 var space = initCanvas();
-var parameters = DEFAULT_PARAMETERS.quarticGameParameters;
+var parameters = DEFAULT_PARAMETERS.calibrationParametersA;
 
 window.addEventListener('load', function(event) {
     GameState.setupSpace(space);
 })
 
-const parameterForm = document.getElementById("parameter-form");
-parameterForm.onchange = function () {
-    var parameters = loadGameParametersFromForm();
-    GameState.updateParameters(parameters);
-    GameState.startNewGameLoop();
-}
-
-const startGameButton = document.getElementById("start-game");
-startGameButton.addEventListener("click", function (event) {
-    event.preventDefault();
-    GameState.setupGame(parameters, 'sim');
-    GameState.startGameLoop();
-})
-
-const endGameButton = document.getElementById("end-game");
-endGameButton.addEventListener("click", function (event) {
-    event.preventDefault();
-    var data = GameState.endGame();
-    loadGameDataIntoDocument(data);
-})
-
-const launchMultipleSimulationsButton = document.getElementById("start-multi-stage-simulation");
-launchMultipleSimulationsButton.addEventListener("click", function (event) {
-    event.preventDefault();
-    const { calibrationParameters, stableParameters, unstableParameters, saddleParameters } = DEFAULT_PARAMETERS;
-
-    GameState.setupGame(calibrationParameters, 'sim', space);
-    loadParametersIntoForm(calibrationParameters);
-    GameState.startNewGameLoop();
-    setTimeout(function () { 
-        GameState.updateParameters(stableParameters);
-        loadParametersIntoForm(stableParameters);
-    }, 1000);
-    setTimeout(function () { 
-        GameState.updateParameters(unstableParameters);
-        loadParametersIntoForm(unstableParameters);
-    }, 2000);
-    setTimeout(function () { 
-        GameState.updateParameters(saddleParameters);
-        loadParametersIntoForm(saddleParameters);
-    }, 3000);
-    setTimeout(function () {;
-        loadGameDataIntoDocument(GameState.endGame());
-    }, 4000);
-})
-
-
+window.addEventListener('keyup', keyboardGameControls);
 
 //Helper functions
 //Attaches listeners to buttons and keyboard for toggle events (loading parameters, starting game,
 //triggering simulations.)
+
+/**
+ * Keyboard controls for game: 
+ *  - ctrl + 's' => start game
+ *  - ctrl + 'e => end game
+ *  - ctrl + 'm' => launch calibration test
+ */
+function keyboardGameControls(e) {
+    if(!!e.ctrlKey) {
+        if(e.keyCode === 83) {
+            event.preventDefault();
+            GameState.setupGame(parameters, 'p1-vs-sim');
+            GameState.startGameLoop();
+        } else if (e.keyCode === 69) {
+            event.preventDefault();
+            var data = GameState.endGame();
+            loadGameDataIntoDocument(data);
+        } else if (e.keyCode === 77) {
+            event.preventDefault();
+            console.log("game started");
+            launchMultipleSimulations();
+        }
+    }
+}
+
+function launchMultipleSimulations() {
+        const { calibrationParametersA, calibrationParametersB } = DEFAULT_PARAMETERS;
+        GameState.setupGame(calibrationParametersA, 'p1-vs-sim', space);
+        GameState.startGameLoop();
+        for(let i = 1; i <= 10; i++) {
+            if (i % 2 == 0) {
+                setTimeout(function() {
+                    GameState.updateParameters(calibrationParametersB);
+                }, i * 2000);
+            } else {
+                setTimeout(function() {
+                    GameState.updateParameters(calibrationParametersA);
+                }, i * 2000);
+            }
+        }
+}
 
 //Creates a Pts space and canvas.
 function initCanvas() {
@@ -76,7 +72,7 @@ function initOscillator() {
     synth.triggerAttack("C4");
     var osc = new Tone.Oscillator({
         "frequency": 261.626,
-        "type": "sawtooth10",
+        "type": "triangle4",
         "volume": -60
     }).toMaster();
     osc.start();
@@ -89,11 +85,11 @@ function loadGameDataIntoDocument(dataPoints) {
     var newDiv = document.createElement('div');
     
     for(let gameData of totalGameData) {
-        var rows = JSON.stringify(gameData.parameters) + "\n";
+        var rows = JSON.stringify(gameData.payload.parameters) + "\n";
         appendStringAsPTag(rows, newDiv);
-        let csvContent = "data:text/csv;charset=utf-8,";
-        appendStringAsPTag(csvContent, newDiv);
-        for(var dataPoint of gameData.dataPoints) {
+        // let csvContent = "data:text/csv;charset=utf-8,";
+        // appendStringAsPTag(csvContent, newDiv);
+        for(var dataPoint of gameData.payload.dataPoints) {
             var formattedDataPoint = dataPoint.map((action) => { return action.toFixed(3); });
             var csvConvertedDataPoint = String(formattedDataPoint).substring(1, String(formattedDataPoint).length - 1);
             appendStringAsPTag(csvConvertedDataPoint, newDiv);
@@ -108,45 +104,5 @@ function loadGameDataIntoDocument(dataPoints) {
         var textNode = document.createTextNode(str);
         node.appendChild(textNode);
         parentDiv.appendChild(node);
-    }
-}
-
-//Loads parameters from sessionStorage into variables, and updates fields of parameter forms to those values.
-//If sessionStorage doesn't contain any data about parameters, the default params are loaded and used instead.
-function loadParametersIntoForm(parameters) {
-    var { gameplayParameters, visualParameters } = parameters;
-
-    for (let [parameter, value] of Object.entries(gameplayParameters)) {
-        document.getElementById("parameter-" + parameter).setAttribute("value", value);
-    }
-
-    for (let [parameter, value] of Object.entries(visualParameters)) {
-        document.getElementById("parameter-" + parameter).setAttribute("value", value);
-    }
-}
-
-//reloads game and visual parameters upon form submit.
-function loadGameParametersFromForm() {
-    const parameterForm = document.getElementById("parameter-form");
-    let FD = new FormData(parameterForm);
-
-    var gameplayParameters = JSON.parse(sessionStorage.getItem("gameplayParameters"));
-    var visualParameters = JSON.parse(sessionStorage.getItem("visualParameters"));
-
-    for (var key of Object.keys(gameplayParameters)) {
-        gameplayParameters[key] = parseFloat(FD.get(key));
-        document.getElementsByName(key)[0].value = FD.get(key);
-    }
-    for (var key of Object.keys(visualParameters)) {
-        gameplayParameters[key] = parseFloat(FD.get(key));
-        document.getElementsByName(key)[0].value = FD.get(key);
-    }
-
-    sessionStorage.setItem("gameplayParameters", JSON.stringify(gameplayParameters));
-    sessionStorage.setItem("visualParameters", JSON.stringify(visualParameters));
-
-    return {
-        gameplayParameters,
-        visualParameters
     }
 }

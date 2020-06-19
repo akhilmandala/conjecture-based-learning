@@ -10,7 +10,7 @@ body {
 }
 
 #gameplay-window-total {
-    width: 60%;
+    width: 100%;
     flex: 3 3 auto;
 }
 
@@ -18,12 +18,12 @@ body {
     height:100%;
 }
 
-#parameter-control-box {
-    width: 40%;
+/* #parameter-control-box {
+    width: 10%;
     height: 100%;
     flex: 1 1 auto;
     padding: 20px;
-}
+} */
 
 .settings {
     display:grid;
