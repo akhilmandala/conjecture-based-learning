@@ -24,6 +24,14 @@ var Game = {
 
         this.playerOne = Object.create(playerOne);
         this.playerTwo = Object.create(playerTwo);
+
+        this.osc = new Tone.Oscillator({
+            "frequency": 261.626,
+            "type": "triangle4",
+            "volume": -40
+        }).toMaster();
+        this.osc.start();
+    
     },
     setupSpace: function (space) {
         this.space = space;
@@ -164,11 +172,22 @@ var Game = {
             case 'p1-vs-p2':
                 x_out = x_in;
                 y_out = y_in;
+                break;
+            default:
+                console.log("Error: mode " + this.mode + " not supported");
                 return;
         }
 
         this.dataPoints.push(currentAction);
         this.currentAction = [x_out, y_out];
+        var cost_p1 = this.playerOne.cost(x,y);
+        var freq = 10*f1*math.abs(cost_p1)+220;
+        // var freq = 50*math.log(1000 * (f1+50));
+        // var freq = math.exp(f1/10)+440;j
+        // console.log("cost: "+f1);
+        // console.log("freq: "+freq);
+        this.osc.frequency.rampTo(freq, 10 / 1000);
+
     },
     _generateGameIPlayer: function() {
         const yCenter = document.getElementById("gameplay-window-total").offsetHeight / 2;

@@ -50,7 +50,7 @@ function launchCalibrationTest() {
     GameState.launchExperiment({
         numberOfTrials: 10,
         trialDuration: 2000, //ms
-        mode: 'p1-v-sim',
+        mode: 'p1-vs-sim',
         parameterSets: [DEFAULT_PARAMETERS.calibrationParametersA, DEFAULT_PARAMETERS.calibrationParametersB]
     });
 }
