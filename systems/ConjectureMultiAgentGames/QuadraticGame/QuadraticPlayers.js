@@ -14,7 +14,10 @@ var QuadraticMachineX = Object.create(Player);
  * @returns {void} Nothing
  */
 QuadraticMachineX.createPlayer = function (parameters, initialAction) {
-    this.init(parameters);
+    this.init({
+        parameters: parameters,
+        operator: 'machine'
+    });
     this.action = initialAction;
 };
 
@@ -60,7 +63,10 @@ var QuadraticMachineY = Object.create(Player);
  * @returns {void} Nothing
  */
 QuadraticMachineY.createPlayer = function (parameters, initialAction) {
-    this.init(parameters);
+    this.init({
+        parameters: parameters,
+        operator: 'machine'
+    });
     this.action = initialAction;
 };
 
