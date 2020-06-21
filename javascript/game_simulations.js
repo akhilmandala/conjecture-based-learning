@@ -3,11 +3,26 @@ import {QuadraticMachineX, QuadraticMachineY} from '../systems/ConjectureMultiAg
 import DEFAULT_PARAMETERS from '../systems/ConjectureMultiAgentGames/QuadraticGame/default-parameters.js';
 Pts.namespace(window);
 
+var DEFAULT_VISUAL_PARAMETERS = {
+    radius: 1,
+    timeScale: 1/1000,
+    visualScale: 100,
+    outputScale: 100,
+    vectorFieldScale: 10,
+    COLOR_P1: "#e63946",
+    COLOR_P2: "#ffba08",
+    PLAYER_ACTION_RADIUS: 5,
+    ORIGIN_RADIUS: 10,
+}
+
 var GameState = Object.create(Game);
 var space = initCanvas();
 
 window.addEventListener('load', function(event) {
-    GameState.setupSpace(space);
+    GameState.setupSpace({
+        space, 
+        visualParameters: DEFAULT_VISUAL_PARAMETERS
+    });
 })
 
 window.addEventListener('keyup', keyboardGameControls);
@@ -49,9 +64,9 @@ function launchCalibrationTest() {
     });
     GameState.launchExperiment({
         numberOfTrials: 10,
-        trialDuration: 2000, //ms
+        trialDuration: 4000, //ms
         mode: 'p1-vs-sim',
-        parameterSets: [DEFAULT_PARAMETERS.calibrationParametersA, DEFAULT_PARAMETERS.calibrationParametersB]
+        parameterSets: [DEFAULT_PARAMETERS.stableParameters, DEFAULT_PARAMETERS.unstableParameters, DEFAULT_PARAMETERS.saddleParameters]
     });
 }
 
