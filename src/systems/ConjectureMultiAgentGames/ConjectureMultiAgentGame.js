@@ -1,18 +1,8 @@
-/**
- * TODO:
- * - spawn Worker to deal with agent calculations
- */
-
-/**
- * Pts/Game UI --> Game worker:
- *     - parameters, game setting, experiment info
- *     - user input
- * Game worker --> Pts/Game UI:
- *     - initial/immutable response data
- *     - x, y
- */
+import {CanvasSpace, Pt, Group, Circle, Create} from 'pts';
+import Tone from 'tone';
 
 var Game = {
+    //Gameplay/calculation control methods
     init: function ({ playerOne, playerTwo }) {
         this.dataIndex = [];
 
@@ -33,12 +23,6 @@ var Game = {
 
         this.osc.start();
     },
-    setupSpace: function ({ space, visualParameters }) {
-        this.space = space;
-        this.form = space.getForm();
-        this.form._ctx = space.ctx;
-        this.visualParameters = visualParameters;
-    },
     startGameLoop: function ({ parameters, mode }) {
         this.parameters = parameters;
         this.mode = mode;
@@ -47,10 +31,7 @@ var Game = {
         this.playerOne.createPlayer(parameters, this.currentAction[0]);
         this.playerTwo.createPlayer(parameters, this.currentAction[1]);
 
-        var controller = this._generateGameIPlayer();
-        this.space.removeAll();
-        this.space.add(controller);
-        this.space.bindMouse().bindTouch().play();
+        this._instantiateGameVisuals();
     },
     endGame: function () {
         this._addCurrentGameHistoryToData();
@@ -86,69 +67,10 @@ var Game = {
             }, i * trialDuration);
         }
     },
-    _createFeatureVisualizations: function (space) {
-        var converter = this._dataToScreenConverter();
-
-        var { PLAYER_ACTION_RADIUS, visualScale, vectorFieldScale } = this.visualParameters;
-
-        var xmin = -100; // autodetect this
-        var xmax = 100;  // 
-        var ymin = -100;
-        var ymax = 100;
-
-        var br1 = Group.fromArray([new Pt(converter.toScreen(this.playerOne.bestResponse(ymin), ymin)),
-        new Pt(converter.toScreen(this.playerOne.bestResponse(ymax), ymax))]);
-
-        // var x_steps = math.range(xmin, xmax, 0.1);
-        // var br1 = Group.fromArray(x_steps.map((x)=> toScreen(new Pt(x, this.playeOne.bestResponseInv(x)))))    
-
-        var br2 = Group.fromArray([new Pt(converter.toScreen(xmin, this.playerTwo.bestResponse(xmin))),
-        new Pt(converter.toScreen(xmax, this.playerTwo.bestResponse(xmax)))]);
-
-        var currentAction = Circle.fromCenter(new Pt(converter.toScreen(...this.currentAction)), PLAYER_ACTION_RADIUS);
-
-        var vectorfield = Create.gridPts(space.innerBound, 30, 30).map((p) => {
-            let q, dx, dy, norm;
-            q = converter.fromScreen(p.x, p.y);
-            dx = this.playerOne.update(q.x, q.y);
-            dy = this.playerTwo.update(q.x, q.y);
-            norm = Math.sqrt(dx * dx + dy * dy);
-            dy /= norm * vectorFieldScale;
-            if (this.mode === 'sim') {
-                dx /= norm * vectorFieldScale;
-            } else {
-                dx = 0;
-            }
-
-            return new Group(p, p.$add(new Pt(dx * visualScale, -dy * visualScale)));
-        });
-
-        var vectorfield_pts = Create.gridPts(space.innerBound, 30, 30);
-
-        return { br1, br2, origin, currentAction, vectorfield, vectorfield_pts };
-    },
-    _dataToScreenConverter: function () {
-        const yCenter = this.space.height / 2;
-        const xCenter = this.space.width / 2;
-        const { visualScale } = this.visualParameters;
-
-        function fromScreen(x, y) {
-            return [(x - xCenter) / visualScale, -(y - yCenter) / visualScale];
-        }
-
-        function toScreen(x, y) {
-            return [x * visualScale + xCenter, -y * visualScale + yCenter];
-        }
-
-        return {
-            fromScreen: fromScreen,
-            toScreen: toScreen
-        };
-    },
     *actionUpdateIO() {
         var x_out, y_out, dt = 0.02;
         var [x, y] = this.currentAction;
-        var converter = this._dataToScreenConverter();
+        var converter = this._dataToVisualizationConverter();
 
         try {
             //find x_outout
@@ -171,7 +93,7 @@ var Game = {
             this.dataPoints.push([performance.now(), this.parameters['d'], x_out, y_out]);
 
             var cost_p1 = this.playerOne.cost(x, y);
-            var freq = 100 * math.abs(cost_p1) + 220;
+            var freq = 100 * Math.abs(cost_p1) + 220;
             // var freq = 50*math.log(1000 * (f1+50));
             // var freq = math.exp(f1/10)+440;j
             // console.log("cost: "+f1);
@@ -198,20 +120,57 @@ var Game = {
 
         step_iterator.next();
     },
+    _addCurrentGameHistoryToData: function addGameToHistory() {
+        this.dataIndex.push({
+            id: Math.random(),
+            payload: {
+                dataPoints: this.dataPoints,
+                parameters: this.parameters,
+            }
+        })
+    },
+    //Visualization methods
+    setupSpace: function ({ space, visualParameters }) {
+        var space = new CanvasSpace("#pt").setup({
+            bgcolor: "#345", resize: true, retina: true
+        });
+        this.space = space;
+        this.form = space.getForm();
+        this.form._ctx = space.ctx;
+        this.visualParameters = visualParameters;
+    },
+    _dataToVisualizationConverter: function () {
+        const yCenter = this.space.height / 2;
+        const xCenter = this.space.width / 2;
+        const { visualScale } = this.visualParameters;
+
+        function fromScreen(x, y) {
+            return [(x - xCenter) / visualScale, -(y - yCenter) / visualScale];
+        }
+
+        function toScreen(x, y) {
+            return [x * visualScale + xCenter, -y * visualScale + yCenter];
+        }
+
+        return {
+            fromScreen: fromScreen,
+            toScreen: toScreen
+        };
+    },
     _generateGameIPlayer: function () {
         return {
             start: this._start_animation.bind(this),
             animate: this._animate.bind(this)
         }
     },
-    _start_animation: function start(bound) {
+    _start_animation: function start() {
         this.history = new Group();
         this.historyIndex.push(this.history);
         this.gameFeatureVisualizations = this._createFeatureVisualizations(this.space);
     },
-    _animate: function animate(time, ftime) {
+    _animate: function animate() {
         var { PLAYER_ACTION_RADIUS, COLOR_P1, COLOR_P2 } = this.visualParameters;
-        var converter = this._dataToScreenConverter();
+        var converter = this._dataToVisualizationConverter();
         const PATH_COLORS = ["#95e1d3", "#eaffd0", "#fce38a", "#f38181", "#639fab", "fcf300", "eb5160", "b7999c"];
 
         if(this.history.length == 0) {
@@ -236,14 +195,52 @@ var Game = {
             this.form.strokeOnly(PATH_COLORS[i % PATH_COLORS.length], 2).line((this.historyIndex[i]).map(([x, y]) => new Pt(converter.toScreen(x, y))));
         }
     },
-    _addCurrentGameHistoryToData: function addGameToHistory() {
-        this.dataIndex.push({
-            id: Math.random(),
-            payload: {
-                dataPoints: this.dataPoints,
-                parameters: this.parameters,
+    _createFeatureVisualizations: function (space) {
+        var converter = this._dataToVisualizationConverter();
+
+        var { PLAYER_ACTION_RADIUS, visualScale, vectorFieldScale } = this.visualParameters;
+
+        var xmin = -100; // autodetect this
+        var xmax = 100;  // 
+        var ymin = -100;
+        var ymax = 100;
+
+        var br1 = Group.fromArray([new Pt(converter.toScreen(this.playerOne.bestResponse(ymin), ymin)),
+            new Pt(converter.toScreen(this.playerOne.bestResponse(ymax), ymax))]);
+
+        // var x_steps = math.range(xmin, xmax, 0.1);
+        // var br1 = Group.fromArray(x_steps.map((x)=> toScreen(new Pt(x, this.playeOne.bestResponseInv(x)))))    
+
+        var br2 = Group.fromArray([new Pt(converter.toScreen(xmin, this.playerTwo.bestResponse(xmin))),
+            new Pt(converter.toScreen(xmax, this.playerTwo.bestResponse(xmax)))]);
+
+        var currentAction = Circle.fromCenter(new Pt(converter.toScreen(...this.currentAction)), PLAYER_ACTION_RADIUS);
+
+        var vectorfield = Create.gridPts(space.innerBound, 30, 30).map((p) => {
+            let q, dx, dy, norm;
+            q = converter.fromScreen(p.x, p.y);
+            dx = this.playerOne.update(q.x, q.y);
+            dy = this.playerTwo.update(q.x, q.y);
+            norm = Math.sqrt(dx * dx + dy * dy);
+            dy /= norm * vectorFieldScale;
+            if (this.mode === 'sim') {
+                dx /= norm * vectorFieldScale;
+            } else {
+                dx = 0;
             }
-        })
+
+            return new Group(p, p.$add(new Pt(dx * visualScale, -dy * visualScale)));
+        });
+
+        var vectorfield_pts = Create.gridPts(space.innerBound, 30, 30);
+
+        return { br1, br2, origin, currentAction, vectorfield, vectorfield_pts };
+    },
+    _instantiateGameVisuals: function() {
+        var controller = this._generateGameIPlayer();
+        this.space.removeAll();
+        this.space.add(controller);
+        this.space.bindMouse().bindTouch().play();
     }
 }
 
