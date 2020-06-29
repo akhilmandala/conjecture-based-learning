@@ -10,5 +10,5 @@ Todo:
     - configuring game players
     - configuring parameters
     - "deploying" experiments (researcher:player clients)
-    - drogon-core web framework
-    - implementing webGL games
+- drogon-core web framework
+- implementing webGL games
