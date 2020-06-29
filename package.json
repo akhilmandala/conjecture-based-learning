@@ -17,8 +17,12 @@
   },
   "homepage": "https://github.com/akhilmandala/conjecture-based-learning#readme",
   "dependencies": {
+    "eslint": "^7.3.0",
+    "eslint-config-prettier": "^6.11.0",
     "express": "^4.17.1",
     "jsdoc": "^3.6.4",
-    "pts": "^0.9.4"
+    "pts": "^0.9.4",
+    "tone": "^13.8.25",
+    "vue": "^2.6.11"
   }
 }
