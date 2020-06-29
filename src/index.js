@@ -1,8 +1,7 @@
 import {Game} from './systems/ConjectureMultiAgentGames/ConjectureMultiAgentGame.js';
 import {QuadraticMachineX, QuadraticMachineY} from './systems/ConjectureMultiAgentGames/QuadraticGame/QuadraticPlayers.js'
 import DEFAULT_PARAMETERS from './systems/ConjectureMultiAgentGames/QuadraticGame/default-parameters.js';
-
-Pts.namespace(window);
+import './css/index.css';
 
 var DEFAULT_VISUAL_PARAMETERS = {
     radius: 1,
@@ -17,34 +16,19 @@ var DEFAULT_VISUAL_PARAMETERS = {
 }
 
 var GameState = Object.create(Game);
-var space = initCanvas();
 
 window.addEventListener('load', function(event) {
     GameState.setupSpace({
-        space, 
         visualParameters: DEFAULT_VISUAL_PARAMETERS
     });
 })
 
 window.addEventListener('keyup', keyboardGameControls);
 
-// var vm = new Vue({
-//     el: "#app",
-//     data: {
-//         message: "Hello!"
-//     }
-// });
-
-//Helper functions
-/**
- * Keyboard controls for game: 
- *  - ctrl + 's' => start game
- *  - ctrl + 'e => end game
- *  - ctrl + 'm' => launch calibration test
- */
 function keyboardGameControls(e) {
     if(e.ctrlKey) {
         if(e.keyCode === 83) {
+            //start game
             event.preventDefault();
             GameState.init({
                 playerOne: QuadraticMachineX, 
@@ -55,10 +39,12 @@ function keyboardGameControls(e) {
                 mode: 'p1-vs-sim'
             });
         } else if (e.keyCode === 69) {
+            //end game
             event.preventDefault();
             var data = GameState.endGame();
             loadGameDataIntoCSV(data);
         } else if (e.keyCode === 77) {
+            //launch experiment
             event.preventDefault();
             launchCalibrationTest();
         }
@@ -79,13 +65,6 @@ function launchCalibrationTest() {
 }
 
 //Creates a Pts space and canvas.
-function initCanvas() {
-    var space = new Pts.CanvasSpace("#pt").setup({
-        bgcolor: "#345", resize: true, retina: true
-    });
-    return space;
-}
-
 function loadGameDataIntoCSV(dataPoints) {
     var totalGameData = dataPoints;
     

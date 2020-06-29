@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -23,6 +24,12 @@
     "jsdoc": "^3.6.4",
     "pts": "^0.9.4",
     "tone": "^13.8.25",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "webpack": "^4.43.0"
+  },
+  "devDependencies": {
+    "css-loader": "^3.6.0",
+    "style-loader": "^1.2.1",
+    "webpack-cli": "^3.3.12"
   }
 }

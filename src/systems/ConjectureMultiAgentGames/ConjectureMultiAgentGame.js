@@ -1,4 +1,5 @@
-
+import {CanvasSpace, Pt, Group, Circle, Create} from 'pts';
+import Tone from 'tone';
 
 var Game = {
     //Gameplay/calculation control methods
@@ -130,6 +131,9 @@ var Game = {
     },
     //Visualization methods
     setupSpace: function ({ space, visualParameters }) {
+        var space = new CanvasSpace("#pt").setup({
+            bgcolor: "#345", resize: true, retina: true
+        });
         this.space = space;
         this.form = space.getForm();
         this.form._ctx = space.ctx;
@@ -202,13 +206,13 @@ var Game = {
         var ymax = 100;
 
         var br1 = Group.fromArray([new Pt(converter.toScreen(this.playerOne.bestResponse(ymin), ymin)),
-        new Pt(converter.toScreen(this.playerOne.bestResponse(ymax), ymax))]);
+            new Pt(converter.toScreen(this.playerOne.bestResponse(ymax), ymax))]);
 
         // var x_steps = math.range(xmin, xmax, 0.1);
         // var br1 = Group.fromArray(x_steps.map((x)=> toScreen(new Pt(x, this.playeOne.bestResponseInv(x)))))    
 
         var br2 = Group.fromArray([new Pt(converter.toScreen(xmin, this.playerTwo.bestResponse(xmin))),
-        new Pt(converter.toScreen(xmax, this.playerTwo.bestResponse(xmax)))]);
+            new Pt(converter.toScreen(xmax, this.playerTwo.bestResponse(xmax)))]);
 
         var currentAction = Circle.fromCenter(new Pt(converter.toScreen(...this.currentAction)), PLAYER_ACTION_RADIUS);
 
